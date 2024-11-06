@@ -1,14 +1,13 @@
-"use client"
+import "./globals.css"
 
-import "./globals.css";
-
-import type { Metadata } from "next";
+import type { Metadata } from "next"
 import { Quicksand, Rubik } from "next/font/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/context/ThemeContext";
-import { UserProvider } from "@/context/UserContext";
+import { cn } from "@/lib/utils"
+import { ThemeProvider } from "@/contexts/ThemeContext"
+import { UserProvider } from "@/contexts/UserContext"
+import MainMenu from "@/components/ui/main_menu"
 
 const mainFontFamily = Quicksand({
   variable: "--font-family-main",
@@ -23,10 +22,11 @@ const submainFontFamily = Rubik({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-// export const metadata: Metadata = {
-//   title: "SISV",
-//   description: "Sistema de Informação de Vendas",
-// };
+export const metadata: Metadata = {
+  title: 'SISV',
+  description: 'Sistema de Informação de Vendas',
+  creator: '4easy Tecnologia'
+};
 
 export default function RootLayout({
   children,
@@ -43,15 +43,16 @@ export default function RootLayout({
           "min-h-screen bg-background font-main antialiased",
           `${mainFontFamily.variable} ${submainFontFamily.variable}`
       )}>
-        <UserProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <UserProvider>
+            <MainMenu />
             {children}
-          </ThemeProvider>
-        </UserProvider>
+          </UserProvider>
+        </ThemeProvider>
       </body>
       <Analytics />
       <SpeedInsights />

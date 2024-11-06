@@ -1,31 +1,37 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+"use client"
 
-// Definindo a interface para o usuário
+import React, { createContext, useContext, useState, ReactNode } from 'react'
+import Cookies from 'js-cookie'
+import { TOKEN_KEY } from '@/constants'
+import { redirect } from 'next/navigation'
+
 interface User {
-  id: string;
-  name: string;
-  // Adicione outros campos conforme necessário
+  id: number
+  name: string
+  token: string
 }
 
-// Definindo a interface para o contexto do usuário
 interface UserContextType {
-  user: User | null;
-  login: (userData: User) => void;
-  logout: () => void;
+  user: User | null
+  login: (userData: User) => void
+  logout: () => void
 }
 
-// Criando o contexto do usuário
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = (userData: User) => {
-    setUser(userData); // Aqui você pode definir a lógica de login
+    setUser(userData)
+    Cookies.set(TOKEN_KEY, userData.token, { expires: 1 })
+    redirect('/dashboard')
   };
 
   const logout = () => {
-    setUser(null); // Lógica para logout
+    setUser(null)
+    Cookies.remove(TOKEN_KEY)
+    redirect('/login')
   };
 
   return (
@@ -35,7 +41,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Hook para usar o contexto do usuário
 export const useUser = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
