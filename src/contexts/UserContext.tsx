@@ -27,6 +27,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     try {
       const cookie = Cookies.get(TOKEN_KEY)
+      
       if (cookie) {
         setUser({ id: 1, name: 'Augusto', token: cookie })
       } else {

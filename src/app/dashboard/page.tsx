@@ -47,7 +47,7 @@ export default async function Dashboard() {
             </div>
             <p className="text-xs text-muted-foreground">
               <span className={crescimentoMensal >= 0 ? "text-green-500 text-sm" : "text-red-500 text-sm"}>
-                {crescimentoMensal >= 0 ? '+' : '-'}{crescimentoMensal}%
+                {crescimentoMensal >= 0 ? '+' : ''}{crescimentoMensal}%
               </span>
               {' '}em relação ao mês anterior
             </p>

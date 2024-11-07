@@ -11,6 +11,8 @@ export default function Page() {
   useEffect(() => {
     if (user) {
       push('/dashboard')
+    } else {
+      push('/login')
     }
   }, [])
 

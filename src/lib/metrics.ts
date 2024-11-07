@@ -174,7 +174,6 @@ export async function getProdutosMaisVendidos() {
     { nome: 'Prod. C', quantidade: 198 },
     { nome: 'Prod. D', quantidade: 67 },
     { nome: 'Prod. E', quantidade: 245 }
-    // ...
   ];
 }
 
