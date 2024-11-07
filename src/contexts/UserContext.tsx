@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import Cookies from 'js-cookie'
 import { TOKEN_KEY } from '@/constants'
 import { useRouter } from 'next/navigation'
@@ -24,11 +24,23 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    try {
+      const cookie = Cookies.get(TOKEN_KEY)
+      if (cookie) {
+        setUser({ id: 1, name: 'Augusto', token: cookie })
+      } else {
+        push('/login')
+      }
+    } catch (error) {
+      console.error('Erro ao obter cookie: ', error)
+    }
+  }, [])
+
   const login = (userData: User) => {
     setUser(userData)
     const ret = Cookies.set(TOKEN_KEY, userData.token, { expires: 1 })
     if (ret !== '') {
-      console.log('redirecionar...')
       push('/dashboard')
     }
   };
