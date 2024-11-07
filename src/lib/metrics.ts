@@ -1,7 +1,6 @@
 // import { prisma } from './db';
-import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { subMonths, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 // Dados mocados para teste
 const MOCK_DATA = {

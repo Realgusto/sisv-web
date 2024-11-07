@@ -3,9 +3,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import Cookies from 'js-cookie'
 import { TOKEN_KEY } from '@/constants'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
-interface User {
+export interface User {
   id: number
   name: string
   token: string
@@ -20,18 +20,23 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { push } = useRouter()
+
   const [user, setUser] = useState<User | null>(null);
 
   const login = (userData: User) => {
     setUser(userData)
-    Cookies.set(TOKEN_KEY, userData.token, { expires: 1 })
-    redirect('/dashboard')
+    const ret = Cookies.set(TOKEN_KEY, userData.token, { expires: 1 })
+    if (ret !== '') {
+      console.log('redirecionar...')
+      push('/dashboard')
+    }
   };
 
   const logout = () => {
     setUser(null)
     Cookies.remove(TOKEN_KEY)
-    redirect('/login')
+    push('/login')
   };
 
   return (

@@ -31,7 +31,7 @@ export default async function Dashboard() {
   const produtosMaisVendidos = await getProdutosMaisVendidos();
 
   return (
-    <div className="p-16 space-y-6 w-full max-w-full overflow-x-hidden">
+    <div className="p-6 space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -47,7 +47,7 @@ export default async function Dashboard() {
             </div>
             <p className="text-xs text-muted-foreground">
               <span className={crescimentoMensal >= 0 ? "text-green-500 text-sm" : "text-red-500 text-sm"}>
-                {crescimentoMensal >= 0 ? '+' : ''}{crescimentoMensal}%
+                {crescimentoMensal >= 0 ? '+' : '-'}{crescimentoMensal}%
               </span>
               {' '}em relação ao mês anterior
             </p>

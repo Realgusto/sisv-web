@@ -2,8 +2,6 @@
 
 import { useTheme } from 'next-themes'
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -72,7 +70,7 @@ export function SalesChart({ data }: SalesChartProps) {
     }).format(value)
   }
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active: boolean; payload: { value: number }[]; label: string }) => {
     if (active && payload && payload.length) {
       return (
         <Card className="p-3">
@@ -117,7 +115,7 @@ export function SalesChart({ data }: SalesChartProps) {
             axisLine={false}
           />
           <Tooltip 
-            content={<CustomTooltip />}
+            content={<CustomTooltip active={false} payload={[]} label="" />}
             cursor={{ stroke: currentTheme === 'dark' ? '#4B5563' : '#D1D5DB' }}
           />
           <Area

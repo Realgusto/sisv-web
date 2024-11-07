@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useEffect, useRef, useState } from 'react';
 
@@ -44,7 +44,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
 
   const currentTheme = theme === 'system' ? systemTheme : theme;
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active: boolean; payload: { value: number }[]; label: string }) => {
     if (active && payload && payload.length) {
       return (
         <Card className="p-3">
@@ -88,7 +88,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
                 axisLine={false}
                 />
                 <Tooltip
-                content={<CustomTooltip />}
+                content={<CustomTooltip active={false} payload={[]} label="" />}
                 cursor={{ 
                     fill: currentTheme === 'dark' ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.2)' 
                 }}

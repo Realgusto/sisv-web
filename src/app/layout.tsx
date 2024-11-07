@@ -5,7 +5,7 @@ import { Quicksand, Rubik } from "next/font/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/contexts/ThemeContext"
+import { ThemeProvider } from "@/providers/theme-provider"
 import { UserProvider } from "@/contexts/UserContext"
 import MainMenu from "@/components/ui/main_menu"
 
@@ -35,9 +35,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br" suppressHydrationWarning>
-      <head>
-        <meta title="SISV" aria-description="Sistema de Informação de Vendas" />
-      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-main antialiased",
