@@ -69,7 +69,7 @@ export async function DELETE(request: Request) {
         await prisma.purchase.delete({
             where: { id: id },
         });
-        return NextResponse.json({ message: 'Ordem deletada com sucesso' });
+        return NextResponse.json({ id: id, message: 'Ordem deletada com sucesso' });
     } catch (error) {
         console.error('Erro ao deletar ordem: ', error);
         return NextResponse.json({ error: 'Erro ao deletar ordem: ' + error }, { status: 500 });

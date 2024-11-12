@@ -22,7 +22,7 @@ import {
     DialogFooter
 } from '@/components/ui/dialog'
 import { v4 as uuidv4 } from 'uuid'
-import { CalendarIcon, Edit, MoreVertical, Plus, Trash } from 'lucide-react'
+import { CalendarIcon, Edit, MoreVertical, Plus, Trash, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
     Popover,
@@ -39,12 +39,25 @@ import {
 import { toast } from 'sonner'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 
 export default function Order() {
     const [orders, setOrders] = useState<Order[]>([])
     const [isDialogOpen, setDialogOpen] = useState(false)
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true)
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [currentOrder, setCurrentOrder] = useState<Order>({
         id: '',
         date: new Date(),
@@ -66,24 +79,47 @@ export default function Order() {
         setDialogOpen(false)
     }
 
-    const handleDeleteOrder = async (id: string) => {
+    const handleOpenAlertDialog = (order: Order) => {
+        setCurrentOrder(order)
+        setIsAlertDialogOpen(true)
+    }
+
+    const handleDeleteOrder = async () => {
+        setIsDeleting(true)
         try {
-            // await fetch(`/api/purchases/${id}`, { method: 'DELETE' })
-            // toast.success('Ordem deletada com sucesso')
-            toast.success("Ordem deletada com sucesso", {
-                description: "Você pode restaurar a ordem em 30 dias",
-                action: {
-                  label: "Desfazer",
-                  onClick: () => console.log("Desfazer"),
+            const response = await fetch('/api/purchases', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({ id: currentOrder.id })
             })
+
+            if (!response.ok) {
+                throw new Error('Erro ao deletar a ordem: ' + response.statusText)
+            }
+
+            const data = await response.json()
+            setOrders(prevOrders => prevOrders.filter(order => order.id !== data.id));
+            toast.success(data.message, {
+                // description: "Você pode restaurar a ordem em 30 dias",
+                // action: {
+                    //   label: "Desfazer",
+                    //   onClick: () => console.log("Desfazer"),
+                // },
+            })
+            setIsAlertDialogOpen(false)
         } catch (error) {
             console.error(error)
+            alert('Ocorreu um erro ao apagar a ordem. Tente novamente mais tarde: ' + error)
+        } finally {
+            setIsDeleting(false)
         }
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setIsSubmitting(true);
 
         if (currentOrder.supplier === '' || currentOrder.product === '' || currentOrder.quantity <= 0 || currentOrder.value <= 0) {
             alert('Preencha todos os campos corretamente')
@@ -109,7 +145,7 @@ export default function Order() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(newOrder)
-            });
+            })
 
             if (!response.ok) {
                 throw new Error('Erro ao salvar a ordem: ' + response.statusText);
@@ -121,10 +157,12 @@ export default function Order() {
             } else {
                 setOrders(prevOrders => [...prevOrders, data]);
             }
-            handleCloseDialog();
+            handleCloseDialog()
         } catch (error) {
-            console.error('Erro ao salvar a ordem: ', error);
-            alert('Ocorreu um erro ao salvar a ordem. Tente novamente mais tarde: ' + error);
+            console.error('Erro ao salvar a ordem: ', error)
+            alert('Ocorreu um erro ao salvar a ordem. Tente novamente mais tarde: ' + error)
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -134,16 +172,18 @@ export default function Order() {
             try {
                 const response = await fetch('/api/purchases', {
                     method: 'GET',
-                });
+                })
+
                 if (!response.ok) {
                     throw new Error('Erro ao buscar ordens: ' + response.statusText);
                 }
+
                 const data = await response.json()
-                setOrders(data);
+                setOrders(data)
             } catch (error) {
                 console.error(error)
             } finally {
-                setIsLoading(false);
+                setIsLoading(false)
             }
         }
 
@@ -175,7 +215,7 @@ export default function Order() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {   isLoading && orders.length === 0 ? 
+                    {   isLoading ? 
                         <TableRow className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
                             <TableCell className="h-[120px] sm:h-[80px]">
                                 <Skeleton className="h-10 w-full rounded-lg" />
@@ -223,11 +263,37 @@ export default function Order() {
                                             <DropdownMenuItem onClick={() => handleOpenDialog(order)}>
                                                 <Edit className="h-3 w-3 mr-2" /> Editar
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-400" onClick={() => handleDeleteOrder(order.id)}>
+                                            <DropdownMenuItem className="text-red-400 hover:text-red-500" onClick={() => handleOpenAlertDialog(order)}>
                                                 <Trash className="h-3 w-3 mr-2" /> Apagar
-                                            </DropdownMenuItem>
+                                            </DropdownMenuItem>                                            
                                         </DropdownMenuContent>
                                     </DropdownMenu>
+                                    <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Esta ação é irreversível e irá deletar a ordem permanentemente.
+                                                    <br />
+                                                    Fornecedor: { currentOrder.supplier }
+                                                    <br />
+                                                    Produto: { currentOrder.product }
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel onClick={() => setIsAlertDialogOpen(false)}>
+                                                    <X className="h-3 w-3" />
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    className={`bg-red-500 text-white hover:bg-red-600 ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    onClick={() => handleDeleteOrder()}
+                                                    disabled={isDeleting}
+                                                >
+                                                    {isDeleting ? 'Apagando...' : <><Trash className="h-3 w-3 mr-2" /> Apagar</>}
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </TableCell>
                             </TableRow>
                         ))
@@ -332,16 +398,16 @@ export default function Order() {
                                     value={currentOrder.observations}
                                     onChange={(e) => setCurrentOrder({ ...currentOrder, observations: e.target.value })} 
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                                    required
                                 />
                             </div>
 
                             <DialogFooter>
                                 <Button 
                                     type="submit"
-                                    className="w-full bg-green-500 text-white hover:bg-green-600"
+                                    className={`bg-green-500 text-white hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    disabled={isSubmitting}
                                 >
-                                    {currentOrder.id !== '' ? 'Salvar Alterações' : 'Adicionar Ordem'}
+                                    {isSubmitting ? 'Salvando...' : currentOrder.id !== '' ? 'Salvar Alterações' : 'Adicionar Ordem'}
                                 </Button>
                             </DialogFooter>
                         </form>
