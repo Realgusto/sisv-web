@@ -7,7 +7,8 @@ import { SpeedInsights } from "@vercel/speed-insights/react"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { UserProvider } from "@/contexts/UserContext"
-import MainMenu from "@/components/ui/main_menu"
+import MainMenu from "@/components/ui/main-menu"
+import { Toaster } from "@/components/ui/sonner"
 
 const mainFontFamily = Quicksand({
   variable: "--font-family-main",
@@ -50,6 +51,7 @@ export default function RootLayout({
             {children}
           </UserProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
       <Analytics />
       <SpeedInsights />

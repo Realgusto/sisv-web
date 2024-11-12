@@ -8,13 +8,15 @@ export async function middleware(request: NextRequest) {
     const cookie = await cookies()
     const token = cookie.get(TOKEN_KEY)
 
-    const protectedRoutes = [ '/dashboard' ]
+    const protectedRoutes = [ '/api', '/dashboard', '/movements' ]
 
     const isProtectedRoute = protectedRoutes.includes(request.nextUrl.pathname)
 
-    if (isProtectedRoute && !token) {
+    const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+
+    if (isProtectedRoute && !token && !isApiRoute) {
         return NextResponse.redirect(new URL('/login', request.url))
-    } else if (request.nextUrl.pathname === '/login' && token) {
+    } else if (request.nextUrl.pathname === '/login' && token && !isApiRoute) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
@@ -22,5 +24,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*']
+    matcher: ['/api/:path*', '/dashboard/:path*', '/movements/:path*']
 }

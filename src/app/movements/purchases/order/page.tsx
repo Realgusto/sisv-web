@@ -1,0 +1,353 @@
+"use client"
+
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import {
+    Table,
+    TableCaption,
+    TableHeader,
+    TableRow,
+    TableHead,
+    TableBody,
+    TableFooter,
+    TableCell
+} from '@/components/ui/table'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter
+} from '@/components/ui/dialog'
+import { v4 as uuidv4 } from 'uuid'
+import { CalendarIcon, Edit, MoreVertical, Plus, Trash } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger
+} from '@/components/ui/popover'
+import { ptBR } from 'date-fns/locale'
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
+import { toast } from 'sonner'
+import { Textarea } from '@/components/ui/textarea'
+import { Skeleton } from '@/components/ui/skeleton'
+
+export default function Order() {
+    const [orders, setOrders] = useState<Order[]>([])
+    const [isDialogOpen, setDialogOpen] = useState(false)
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const [currentOrder, setCurrentOrder] = useState<Order>({
+        id: '',
+        date: new Date(),
+        delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
+        supplier: '',
+        product: '',
+        quantity: 0,
+        value: 0,
+        status: ''
+    })
+
+    const handleOpenDialog = (order: Order | null = null) => {
+        setCurrentOrder(order || { id: '', date: new Date(), delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)), supplier: '', product: '', quantity: 0, value: 0, status: '' })
+        setDialogOpen(true)
+    }
+
+    const handleCloseDialog = () => {
+        setCurrentOrder({ id: '', date: new Date(), delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)), supplier: '', product: '', quantity: 0, value: 0, status: '' })
+        setDialogOpen(false)
+    }
+
+    const handleDeleteOrder = async (id: string) => {
+        try {
+            // await fetch(`/api/purchases/${id}`, { method: 'DELETE' })
+            // toast.success('Ordem deletada com sucesso')
+            toast.success("Ordem deletada com sucesso", {
+                description: "Você pode restaurar a ordem em 30 dias",
+                action: {
+                  label: "Desfazer",
+                  onClick: () => console.log("Desfazer"),
+                },
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        if (currentOrder.supplier === '' || currentOrder.product === '' || currentOrder.quantity <= 0 || currentOrder.value <= 0) {
+            alert('Preencha todos os campos corretamente')
+            return
+        }
+
+        const newOrder: Order = {
+            id: currentOrder.id !== '' ? currentOrder.id : uuidv4(),
+            date: currentOrder.id !== '' ? currentOrder.date : new Date(),
+            supplier: currentOrder.supplier,
+            status: currentOrder.id !== '' ? currentOrder.status : 'Solicitada',
+            value: currentOrder.value,
+            delivery_date: currentOrder.delivery_date,
+            product: currentOrder.product,
+            quantity: currentOrder.quantity,
+        }
+
+        try {
+            const method = currentOrder.id ? 'PUT' : 'POST';
+            const response = await fetch('/api/purchases', {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newOrder)
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao salvar a ordem: ' + response.statusText);
+            }
+
+            const data = await response.json();
+            if (currentOrder.id) {
+                setOrders(prevOrders => prevOrders.map(order => order.id === data.id ? data : order));
+            } else {
+                setOrders(prevOrders => [...prevOrders, data]);
+            }
+            handleCloseDialog();
+        } catch (error) {
+            console.error('Erro ao salvar a ordem: ', error);
+            alert('Ocorreu um erro ao salvar a ordem. Tente novamente mais tarde: ' + error);
+        }
+    }
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch('/api/purchases', {
+                    method: 'GET',
+                });
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar ordens: ' + response.statusText);
+                }
+                const data = await response.json()
+                setOrders(data);
+            } catch (error) {
+                console.error(error)
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchOrders()
+    }, []);
+
+    return (
+        <div className="p-4 sm:p-6 bg-background min-h-screen h-full">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold select-none">Ordens de Compra</h1>
+                <Button 
+                    onClick={() => handleOpenDialog()} 
+                    className="bg-blue-500 text-white hover:bg-blue-600"
+                >
+                    <Plus className="h-5 w-5" />
+                    <span className="hidden sm:block ml-2">Adicionar Ordem</span>
+                </Button>
+            </div>
+            <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
+                <TableCaption className="select-none">Uma lista das suas ordens de compra.</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="sm:w-[120px] select-none">ID</TableHead>
+                        <TableHead className="w-[100px] sm:w-[120px] select-none">Data</TableHead>
+                        <TableHead className="select-none">Produto</TableHead>
+                        <TableHead className="w-[80px] sm:w-[150px] select-none">Quant.</TableHead>
+                        <TableHead className="w-[80px] sm:w-[150px] text-right select-none">Valor</TableHead>
+                        <TableHead className="w-[35px] sm:w-[50px] text-right select-none">Ações</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {   isLoading && orders.length === 0 ? 
+                        <TableRow className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
+                            <TableCell className="h-[120px] sm:h-[80px]">
+                                <Skeleton className="h-10 w-full rounded-lg" />
+                            </TableCell>
+                            <TableCell className="w-[100px] sm:w-[120px]">
+                                <Skeleton className="h-10 w-full rounded-lg" />
+                            </TableCell>
+                            <TableCell>
+                                <Skeleton className="h-10 w-full rounded-lg" />
+                            </TableCell>
+                            <TableCell className="w-[80px] sm:w-[150px]">
+                                <Skeleton className="h-10 w-full rounded-lg" />
+                            </TableCell>
+                            <TableCell className="w-[80px] sm:w-[150px]">
+                                <Skeleton className="h-10 w-full rounded-lg" />
+                            </TableCell>
+                            <TableCell className="w-[35px] sm:w-[50px]">
+                                <Skeleton className="h-10 w-full rounded-lg" />
+                            </TableCell>
+                        </TableRow>
+                     : 
+                        orders.map(order => (
+                            <TableRow key={order.id} className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
+                                <TableCell className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
+                                <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
+                                <TableCell className="select-none text-xs sm:text-base">{order.product}</TableCell>
+                                <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{Number(order.quantity).toLocaleString('pt-BR')} UN</TableCell>
+                                <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">
+                                    {Intl.NumberFormat('pt-BR', {
+                                        style: 'currency',
+                                        currency: 'BRL',
+                                    }).format(order.value)}
+                                </TableCell>
+                                <TableCell className="w-[35px] sm:w-[50px] text-right select-none">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button 
+                                                variant={"secondary"}
+                                                size={"icon"}
+                                            >
+                                                <MoreVertical className="h-3 w-3" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem onClick={() => handleOpenDialog(order)}>
+                                                <Edit className="h-3 w-3 mr-2" /> Editar
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-400" onClick={() => handleDeleteOrder(order.id)}>
+                                                <Trash className="h-3 w-3 mr-2" /> Apagar
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    }
+                </TableBody>
+                <TableFooter>
+                    <TableRow>
+                        <TableCell colSpan={4} className="select-none text-base font-bold">Total</TableCell>
+                        <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-base font-bold">
+                            {Intl.NumberFormat('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                            }).format(orders.reduce((total, order) => total + (order.quantity * order.value), 0))}
+                        </TableCell>
+                        <TableCell className="w-[35px] sm:w-[50px] text-right select-none" />
+                    </TableRow>
+                </TableFooter>
+            </Table>
+
+            <div className="flex justify-center items-center">
+                <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>{currentOrder.id !== '' ? 'Editar Ordem' : 'Adicionar Ordem'}</DialogTitle>
+                            <DialogDescription>
+                                {currentOrder.id !== '' ? 'Faça alterações na ordem aqui. Clique em salvar quando terminar.' : 'Adicione uma nova ordem.'}
+                            </DialogDescription>
+                        </DialogHeader> 
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Data de Entrega</label>
+                                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"secondary"}
+                                            className={cn(
+                                                "justify-start text-left font-normal w-full mt-1",
+                                                !currentOrder.delivery_date && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {currentOrder.delivery_date ? new Date(currentOrder.delivery_date).toLocaleDateString('pt-BR') : <span>Selecione a previsão de entrega</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-0 w-full">
+                                        <Calendar
+                                            mode="single"
+                                            selected={new Date(currentOrder.delivery_date)}
+                                            onSelect={(date) => setCurrentOrder({ ...currentOrder, delivery_date: date || new Date() })}
+                                            initialFocus
+                                            locale={ptBR}
+                                            title="Selecione a data de entrega"
+                                            onDayClick={() => setIsPopoverOpen(false)}
+                                            required
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Fornecedor</label>
+                                <input 
+                                    type="text" 
+                                    value={currentOrder.supplier} 
+                                    onChange={(e) => setCurrentOrder({ ...currentOrder, supplier: e.target.value })} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Produto</label>
+                                <input 
+                                    type="text"
+                                    value={currentOrder.product}
+                                    onChange={(e) => setCurrentOrder({ ...currentOrder, product: e.target.value })} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Quantidade</label>
+                                <input 
+                                    type="number" 
+                                    value={currentOrder.quantity}
+                                    onChange={(e) => setCurrentOrder({ ...currentOrder, quantity: Number(e.target.value) })} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Valor</label>
+                                <input 
+                                    type="number" 
+                                    value={currentOrder.value}
+                                    onChange={(e) => setCurrentOrder({ ...currentOrder, value: Number(e.target.value) })} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
+                                <Textarea
+                                    value={currentOrder.observations}
+                                    onChange={(e) => setCurrentOrder({ ...currentOrder, observations: e.target.value })} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                            </div>
+
+                            <DialogFooter>
+                                <Button 
+                                    type="submit"
+                                    className="w-full bg-green-500 text-white hover:bg-green-600"
+                                >
+                                    {currentOrder.id !== '' ? 'Salvar Alterações' : 'Adicionar Ordem'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </div>
+    );
+}

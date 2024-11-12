@@ -36,7 +36,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Erro ao obter cookie: ', error)
     }
-  }, [])
+  }, [push])
 
   const login = (userData: User) => {
     setUser(userData)

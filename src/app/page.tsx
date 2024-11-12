@@ -14,9 +14,11 @@ export default function Page() {
     } else {
       push('/login')
     }
-  }, [])
+  }, [push, user])
 
   return (
-    <div />
+    <div className="p-4 sm:p-6 bg-background min-h-screen flex justify-center items-center">
+      <h1 className="text-2xl font-bold">Redirecionando...</h1>
+    </div>
   )
 }
