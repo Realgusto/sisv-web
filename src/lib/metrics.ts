@@ -169,11 +169,11 @@ export async function getTicketMedio() {
 export async function getProdutosMaisVendidos() {
   // Retorna os top 5 produtos mais vendidos - Nome até 8 caracteres
   return [
-    { nome: 'Prod. A', quantidade: 150 },
-    { nome: 'Prod. B', quantidade: 120 },
-    { nome: 'Prod. C', quantidade: 198 },
-    { nome: 'Prod. D', quantidade: 67 },
-    { nome: 'Prod. E', quantidade: 245 }
+    { nome: 'A', quantidade: 150, fill: 'hsl(var(--chart-1))' },
+    { nome: 'B', quantidade: 120, fill: 'hsl(var(--chart-2))' },
+    { nome: 'C', quantidade: 198, fill: 'hsl(var(--chart-3))' },
+    { nome: 'D', quantidade: 67, fill: 'hsl(var(--chart-4))' },
+    { nome: 'E', quantidade: 245, fill: 'hsl(var(--chart-5))' }
   ];
 }
 

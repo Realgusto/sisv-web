@@ -15,6 +15,7 @@ import { BarChart2Icon,
          ClipboardIcon,
          DollarSignIcon,
          FileTextIcon,
+         HomeIcon,
          LogOutIcon,
          MenuIcon,
          Search,
@@ -23,6 +24,9 @@ import { BarChart2Icon,
          UsersIcon } from 'lucide-react'
 import { useUser } from '@/contexts/UserContext'
 import { useRouter } from 'next/navigation'
+import FourEasyIcon from '../FourEasyIcon'
+import Link from 'next/link'
+
 const MainMenu = () => {
   const { user, logout } = useUser()
   const { push } = useRouter()
@@ -33,6 +37,10 @@ const MainMenu = () => {
           <>
             {/* Menu completo visível em telas médias e grandes */}
             <div className="hidden sm:flex flex-row">
+              <Link href="/dashboard" className="flex flex-row items-center ml-2">
+                <FourEasyIcon height={30} width={30} />
+                <span className="sr-only">4Easy Tecnologia</span>
+              </Link>
               <MenubarMenu>
                 <MenubarTrigger>Cadastros</MenubarTrigger>
                 <MenubarContent>
@@ -67,7 +75,7 @@ const MainMenu = () => {
                     </MenubarSubTrigger>
                     <MenubarSubContent>
                       <MenubarItem onClick={() => {
-                        push('/movements/purchases/budget')
+                        // push('/movements/purchases/budget')
                       }}>
                         <ClipboardIcon className="mr-3" size={16}/> Orçamentos
                       </MenubarItem>
@@ -75,6 +83,24 @@ const MainMenu = () => {
                         push('/movements/purchases/order')
                       }}>
                         <ClipboardIcon className="mr-3" size={16}/> Ordem de compra
+                      </MenubarItem>
+                    </MenubarSubContent>
+                  </MenubarSub>
+                  <MenubarSeparator />
+                  <MenubarSub>
+                    <MenubarSubTrigger>
+                      <FileTextIcon className="mr-3" size={16}/> Serviços
+                    </MenubarSubTrigger>
+                    <MenubarSubContent>
+                      <MenubarItem onClick={() => {
+                        // push('/movements/services/budget')
+                      }}>
+                        <ClipboardIcon className="mr-3" size={16}/> Orçamentos
+                      </MenubarItem>
+                      <MenubarItem onClick={() => {
+                        push('/movements/services/order')
+                      }}>
+                        <ClipboardIcon className="mr-3" size={16}/> Ordem de serviço
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
@@ -163,6 +189,12 @@ const MainMenu = () => {
               <MenubarMenu>
                 <MenubarTrigger><MenuIcon size={24} /></MenubarTrigger>
                 <MenubarContent>
+                  <MenubarItem onClick={() => {
+                    push('/dashboard')
+                  }}>
+                    <HomeIcon className="mr-3" size={16} /> Dashboard
+                  </MenubarItem>                  
+                  <MenubarSeparator />
                   <MenubarSub>
                     <MenubarSubTrigger>
                       <BoxIcon className="mr-3" size={16}/> Cadastros

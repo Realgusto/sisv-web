@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Purchase" ALTER COLUMN "supplier" DROP NOT NULL,
+ALTER COLUMN "value" DROP NOT NULL,
+ALTER COLUMN "department" SET DATA TYPE TEXT;

@@ -14,8 +14,11 @@ import {
   getLucratividade,
   getProdutosMaisVendidos } from '@/lib/metrics'
 import { TopProductsChart } from '@/components/TopProductsChart'
+import { cn } from '@/lib/utils'
 
 export default async function Dashboard() {
+  const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
+  
   const totalVendasMes = await getTotalVendasMes();
   const clientesAtivos = await getClientesAtivos();
   const produtosEmEstoque = await getProdutosEmEstoque();
@@ -131,23 +134,25 @@ export default async function Dashboard() {
         </Card>
       </div>
 
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Vendas dos Últimos 12 Meses</CardTitle>
-        </CardHeader>
-        <CardContent className="w-full">
-          <SalesChart data={dadosVendas} />
-        </CardContent>
-      </Card>
+      <div className="grid lg:grid-cols-3 gap-4">
+        <Card className="w-full lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">Vendas dos Últimos 12 Meses</CardTitle>
+          </CardHeader>
+          <CardContent className={cn(CONTAINER_HEIGHT, 'w-full')}>
+            <SalesChart data={dadosVendas} />
+          </CardContent>
+        </Card>
 
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Top 5 Produtos Mais Vendidos</CardTitle>
-        </CardHeader>
-        <CardContent className="w-full">
-          <TopProductsChart data={produtosMaisVendidos} />
-        </CardContent>
-      </Card>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">Top 5 Produtos Mais Vendidos</CardTitle>
+          </CardHeader>
+          <CardContent className={cn(CONTAINER_HEIGHT, 'w-full')}>
+            <TopProductsChart data={produtosMaisVendidos} />
+          </CardContent>
+        </Card>
+      </div>
 
       {/* <Tabs defaultValue="all">
         <div className="flex items-center">

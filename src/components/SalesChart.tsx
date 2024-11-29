@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import {
   XAxis,
   YAxis,
@@ -12,6 +11,7 @@ import {
 } from 'recharts'
 import { Card } from '@/components/ui/card'
 import { useEffect, useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 interface VendasMensais {
   mes: string
@@ -23,11 +23,12 @@ interface SalesChartProps {
 }
 
 export function SalesChart({ data }: SalesChartProps) {
+  const CONTAINER_HEIGHT = cn('h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] xl:h-[400px]')
+
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 1700, height: 450 })
-  const { theme, systemTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
-
+  
   useEffect(() => {
     setMounted(true)
     
@@ -49,10 +50,8 @@ export function SalesChart({ data }: SalesChartProps) {
   }, [])
 
   if (!mounted) {
-    return <div className="h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] w-full" />
+    return <div className={cn(CONTAINER_HEIGHT, 'w-full')} />
   }
-
-  const currentTheme = theme === 'system' ? systemTheme : theme
 
   const formatCurrency = (value: number) => {
     if (value >= 1000) {
@@ -74,8 +73,8 @@ export function SalesChart({ data }: SalesChartProps) {
     if (active && payload && payload.length) {
       return (
         <Card className="p-3">
-          <p className="text-sm font-medium">{label}</p>
-          <p className="text-sm font-bold text-primary">
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <p className="text-sm font-bold text-foreground">
             {formatCurrency(payload[0].value)}
           </p>
         </Card>
@@ -85,7 +84,7 @@ export function SalesChart({ data }: SalesChartProps) {
   }
 
   return (
-    <div ref={containerRef} className="h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] w-full">
+    <div ref={containerRef} className={cn(CONTAINER_HEIGHT, 'w-full')}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           width={dimensions.width}
@@ -95,20 +94,20 @@ export function SalesChart({ data }: SalesChartProps) {
         >
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke={currentTheme === 'dark' ? '#374151' : '#E5E7EB'}
+            stroke={'hsl(var(--foreground))'}
             horizontal={true}
             vertical={false}
           />
           <XAxis
             dataKey="mes"
-            stroke={currentTheme === 'dark' ? '#9CA3AF' : '#6B7280'}
+            stroke={'hsl(var(--foreground))'}
             tick={{ fontSize: 12 }}
             tickFormatter={(value) => value.slice(0, 3)}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke={currentTheme === 'dark' ? '#9CA3AF' : '#6B7280'}
+            stroke={'hsl(var(--foreground))'}
             tick={{ fontSize: 12 }}
             tickFormatter={formatCurrency}
             tickLine={false}
@@ -116,16 +115,16 @@ export function SalesChart({ data }: SalesChartProps) {
           />
           <Tooltip 
             content={<CustomTooltip active={false} payload={[]} label="" />}
-            cursor={{ stroke: currentTheme === 'dark' ? '#4B5563' : '#D1D5DB' }}
+            cursor={{ stroke: 'hsl(var(--foreground))'}}
           />
           <Area
-            type="monotone"
+            type="natural"
             dataKey="valor"
-            stroke="#2563EB"
-            fill="#2563EB"
-            fillOpacity={0.2}
+            stroke="hsl(var(--primary))"
+            fill="hsl(var(--primary))"
+            fillOpacity={0.3}
             strokeWidth={2}
-            dot={false}
+            dot={true}
             activeDot={{ r: 4, strokeWidth: 2 }}
           />
         </AreaChart>
