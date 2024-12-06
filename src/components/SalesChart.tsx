@@ -99,7 +99,7 @@ export function SalesChart({ data }: SalesChartProps) {
           width={dimensions.width}
           height={dimensions.height}
           data={data}
-          margin={{ top: 16, right: 2, left: -10, bottom: 10 }}
+          margin={{ top: 16, right: 2, left: 0, bottom: 10 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"

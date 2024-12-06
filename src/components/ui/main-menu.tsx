@@ -98,7 +98,7 @@ const MainMenu = () => {
                         <ClipboardIcon className="mr-3" size={16}/> Orçamentos
                       </MenubarItem>
                       <MenubarItem onClick={() => {
-                        push('/movements/services/order')
+                        // push('/movements/services/order')
                       }}>
                         <ClipboardIcon className="mr-3" size={16}/> Ordem de serviço
                       </MenubarItem>

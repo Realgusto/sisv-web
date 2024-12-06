@@ -71,7 +71,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
             width={dimensions.width}
             height={dimensions.height}
             data={data}
-            margin={{ top: 16, right: 2, left: -10, bottom: 10 }}
+            margin={{ top: 16, right: 2, left: 0, bottom: 10 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -84,7 +84,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
               type="category"
               stroke={'hsl(var(--foreground))'}
               tick={{ fontSize: 11, fontFamily: 'Quicksand' }}
-              tickFormatter={(label) => `${label.slice(0, 10)}`}
+              tickFormatter={(label) => `${label.slice(0, 7)}`}
               tickLine={false}
               axisLine={false}
             />
