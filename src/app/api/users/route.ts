@@ -6,28 +6,46 @@ const prisma = new PrismaClient()
 
 export async function GET(request: Request) {
     const url = new URL(request.url)
+    const id = url.searchParams.get('id')
     const email = url.searchParams.get('email')
     const password = url.searchParams.get('password')
     
     try {
-        if (!email || !password) {
-            return NextResponse.json({ message: 'E-mail e senha são obrigatórios' }, { status: 400 })
+        if (!id && (!email || !password)) {
+            if (!email || !password) {
+                return NextResponse.json({ message: 'E-mail e senha são obrigatórios' }, { status: 400 })
+            } else {
+                return NextResponse.json({ message: 'O campo "ID" é obrigatório' }, { status: 400 })
+            }
         }
 
-        const users: User | null = await prisma.user.findUnique({
-            where: {
-                email,
-                password
-            }
-        })
+        let users: User | null = null;
+
+        if (id) {
+            users = await prisma.user.findUnique({
+                where: { id: id }
+            });
+        } else if (email && password) {
+            users = await prisma.user.findUnique({
+                where: {
+                    email,
+                    password
+                }
+            });
+        }
         
         if (!users) {
-            return NextResponse.json({ message: 'Usuário ou senha inválidos' }, { status: 401 })
+            return NextResponse.json({
+                message: email && password ?
+                  'E-mail ou senha inválidos'
+                    :
+                  'Usuário não encontrado'
+                }, { status: 401 })
         }
 
         return NextResponse.json(users)
     } catch (error) {
-        console.error('Erro ao buscar usuários: ', error)
+        console.error('Erro ao buscar usuários: ' + error)
         return NextResponse.json({ error: 'Erro ao buscar usuários: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -46,7 +64,7 @@ export async function POST(request: Request) {
         })
         return NextResponse.json(newUser, { status: 201 })
     } catch (error) {
-        console.error('Erro ao criar usuário: ', error)
+        console.error('Erro ao criar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao criar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -67,7 +85,7 @@ export async function PUT(request: Request) {
         })
         return NextResponse.json(updatedUser)
     } catch (error) {
-        console.error('Erro ao editar usuário: ', error)
+        console.error('Erro ao editar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao editar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -82,7 +100,7 @@ export async function DELETE(request: Request) {
         })
         return NextResponse.json({ id: id, message: 'Usuário deletado com sucesso' })
     } catch (error) {
-        console.error('Erro ao deletar usuário: ', error)
+        console.error('Erro ao deletar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao deletar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()

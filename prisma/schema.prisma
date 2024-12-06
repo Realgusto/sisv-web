@@ -8,31 +8,47 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  purchases Purchase[] @relation("UserPurchases")
+}
+
 model Purchase {
   id            String   @id @default(cuid())
   date          DateTime
   delivery_date DateTime
+  user_id       String
   supplier      String?
   product       String
   quantity      Int
   value         Float?
   department    String?
   observations  String?
-  status        Status
-}
-
-model User {
-  id       String @id @default(cuid())
-  name     String
-  email    String @unique
-  password String
+  status        Status?
+  user          User     @relation(fields: [user_id], references: [id], name: "UserPurchases")
 }
 
 enum Status {
-  Solicitada
-  Andamento
-  Aprovada
+  Aberta
   Recebida
-  Devolvida
+  Faturada
   Cancelada
+  Pedido_atendido
+  Pedido_aberto
+  Pedido_aprovado
+  Pedido_rejeitado
+  Pedido_encerrado
+}
+
+model Overview {
+  id                String @id
+  salesMonthly      Float
+  averageTicket     Float
+  salesLastYear     Json[]
+  top5BestSeller    Json[]
+  activeCustomers   Int
+  inactiveCustomers Int
 }

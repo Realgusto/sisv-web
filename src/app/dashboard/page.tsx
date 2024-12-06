@@ -1,7 +1,7 @@
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Package, DollarSign, Users, ShoppingCart, UserMinus, PieChart } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { SalesChart } from '@/components/SalesChart'
 import { 
   getClientesAtivos,
@@ -48,12 +48,12 @@ export default async function Dashboard() {
                 currency: 'BRL',
               }).format(totalVendasMes)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              <span className={crescimentoMensal >= 0 ? "text-green-500 text-sm" : "text-red-500 text-sm"}>
+            <CardDescription className="mt-2">
+              <span className={crescimentoMensal >= 0 ? "text-green-500" : "text-red-500"}>
                 {crescimentoMensal >= 0 ? '+' : ''}{crescimentoMensal}%
               </span>
               {' '}em relação ao mês anterior
-            </p>
+            </CardDescription>
           </CardContent>
         </Card>
 
@@ -63,7 +63,7 @@ export default async function Dashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{clientesAtivos}</div>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(clientesAtivos)}</div>
           </CardContent>
         </Card>
 
@@ -73,7 +73,10 @@ export default async function Dashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{produtosEmEstoque}</div>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(produtosEmEstoque)}</div>
+            <CardDescription className="mt-2">
+              Métrica fictícia, apenas para exemplo
+            </CardDescription>
           </CardContent>
         </Card>
 
@@ -99,6 +102,9 @@ export default async function Dashboard() {
                 currency: 'BRL',
               }).format(ticketMedio)}
             </div>
+            <CardDescription className="mt-2">
+              Ticket médio é calculado dividindo o faturamento total pelo número total de vendas realizadas no mês.
+            </CardDescription>
           </CardContent>
         </Card>
 
@@ -108,8 +114,10 @@ export default async function Dashboard() {
             <UserMinus className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{clientesInativos}</div>
-            <p className="text-xs text-muted-foreground">Últimos 30 dias</p>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(clientesInativos)}</div>
+            <CardDescription className="mt-2">
+              Últimos 30 dias
+            </CardDescription>
           </CardContent>
         </Card>
 
@@ -130,6 +138,9 @@ export default async function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{lucratividade}%</div>
+            <CardDescription className="mt-2">
+              Métrica fictícia, apenas para exemplo
+            </CardDescription>
           </CardContent>
         </Card>
       </div>

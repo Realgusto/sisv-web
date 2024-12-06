@@ -54,6 +54,15 @@ export function SalesChart({ data }: SalesChartProps) {
   }
 
   const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      const abbreviated = (value / 1000000).toFixed(1)
+      // Remove o .0 quando não há decimais
+      const finalValue = abbreviated.endsWith('.0') 
+        ? abbreviated.slice(0, -2) 
+        : abbreviated
+      return `R$ ${finalValue}M`
+    }
+    
     if (value >= 1000) {
       const abbreviated = (value / 1000).toFixed(1)
       // Remove o .0 quando não há decimais

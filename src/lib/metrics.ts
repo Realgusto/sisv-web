@@ -1,4 +1,4 @@
-// import { prisma } from './db';
+import { PrismaClient } from '@prisma/client';
 import { subMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -13,179 +13,155 @@ const MOCK_DATA = {
   })).reverse(),
 };
 
-export async function getTotalVendasMes(): Promise<number> {
-  // Versão com Prisma (comentada)
-  /*
-  const inicio = startOfMonth(new Date());
-  const fim = endOfMonth(new Date());
+const prisma = new PrismaClient()
 
-  const vendas = await prisma.venda.aggregate({
+export async function getTotalVendasMes(): Promise<number> {  
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const sales = await prisma.overview.findUnique({
     where: {
-      dataCriacao: {
-        gte: inicio,
-        lte: fim,
-      },
-    },
-    _sum: {
-      valorTotal: true,
+      id: id
     },
   });
 
-  return vendas._sum.valorTotal || 0;
-  */
+  return sales?.salesMonthly || 0;
 
   // Versão com dados mocados
-  return MOCK_DATA.vendasMensais;
+  // return MOCK_DATA.vendasMensais;
 }
 
 export async function getClientesAtivos(): Promise<number> {
-  // Versão com Prisma (comentada)
-  /*
-  const ultimoMes = subMonths(new Date(), 1);
-  
-  const clientes = await prisma.cliente.count({
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const customer = await prisma.overview.findUnique({
     where: {
-      ultimaCompra: {
-        gte: ultimoMes,
-      },
-      ativo: true,
+      id: id
     },
   });
 
-  return clientes;
-  */
+  return customer?.activeCustomers || 0;
 
   // Versão com dados mocados
-  return MOCK_DATA.clientesAtivos;
+  // return MOCK_DATA.clientesAtivos;
 }
 
 export async function getProdutosEmEstoque(): Promise<number> {
-  // Versão com Prisma (comentada)
-  /*
-  const produtos = await prisma.produto.aggregate({
-    where: {
-      quantidadeEstoque: {
-        gt: 0,
-      },
-    },
-    _sum: {
-      quantidadeEstoque: true,
-    },
-  });
+  // const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
 
-  return produtos._sum.quantidadeEstoque || 0;
-  */
+  // const products = await prisma.overview.findUnique({
+  //   where: {
+  //     id: id
+  //   },
+  // });
+
+  // return products?.   estoque  || 0;
 
   // Versão com dados mocados
   return MOCK_DATA.produtosEstoque;
 }
 
 export async function getCrescimentoMensal(): Promise<number> {
-  // Versão com Prisma (comentada)
-  /*
-  const mesAtual = startOfMonth(new Date());
-  const mesAnterior = startOfMonth(subMonths(new Date(), 1));
-  
-  const vendasMesAtual = await prisma.venda.aggregate({
+  const mesAtual = new Date().getMonth() + 1
+  const mesAnterior = new Date().getMonth()
+
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const sales = await prisma.overview.findUnique({
     where: {
-      dataCriacao: {
-        gte: mesAtual,
-      },
-    },
-    _sum: {
-      valorTotal: true,
+      id: id
     },
   });
 
-  const vendasMesAnterior = await prisma.venda.aggregate({
-    where: {
-      dataCriacao: {
-        gte: mesAnterior,
-        lt: mesAtual,
-      },
-    },
-    _sum: {
-      valorTotal: true,
-    },
-  });
+  const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(sales?.salesLastYear))
+  const valorAtual = lastYear.find((sales) => sales.mth === mesAtual) || { tot_sales: 0 };
+  const valorAnterior = lastYear.find((sales) => sales.mth === mesAnterior) || { tot_sales: 0 };
 
-  const valorAtual = vendasMesAtual._sum.valorTotal || 0;
-  const valorAnterior = vendasMesAnterior._sum.valorTotal || 0;
+  if (valorAnterior.tot_sales === 0) return 0;
 
-  if (valorAnterior === 0) return 0;
-  
-  return Math.round(((valorAtual - valorAnterior) / valorAnterior) * 100);
-  */
+  return Math.round(((valorAtual.tot_sales - valorAnterior.tot_sales) / valorAnterior.tot_sales) * 100);
 
   // Versão com dados mocados
-  return Math.round(Math.random() * 40 - 20); // Crescimento variável com possibilidade de negativo
+  // return Math.round(Math.random() * 40 - 20); // Crescimento variável com possibilidade de negativo
 }
 
 export async function getVendasUltimos12Meses(): Promise<VendasMensais[]> {
-  // Versão com Prisma (comentada)
-  /*
-  const meses = Array.from({ length: 12 }, (_, i) => {
-    const data = subMonths(new Date(), i);
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const sales = await prisma.overview.findUnique({
+    where: {
+      id: id
+    },
+  });
+
+  const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(sales?.salesLastYear))
+
+  return lastYear.map((sales) => {
     return {
-      inicio: startOfMonth(data),
-      fim: endOfMonth(data),
-      mes: format(data, 'MMM', { locale: ptBR }),
-    };
-  }).reverse();
-
-  const vendas = await Promise.all(
-    meses.map(async ({ inicio, fim, mes }) => {
-      const resultado = await prisma.venda.aggregate({
-        where: {
-          dataCriacao: {
-            gte: inicio,
-            lte: fim,
-          },
-        },
-        _sum: {
-          valorTotal: true,
-        },
-      });
-
-      return {
-        mes,
-        valor: resultado._sum.valorTotal || 0,
-      };
-    })
-  );
-
-  return vendas;
-  */
+      mes: format(new Date(new Date().getFullYear(), sales.mth - 1), 'MMMM', { locale: ptBR }),
+      valor: sales.tot_sales,
+    }
+  }) || [];
 
   // Versão com dados mocados
-  return MOCK_DATA.historicoVendas;
+  // return MOCK_DATA.historicoVendas;
 }
 
 export async function getTicketMedio() {
-  // Retorna o valor médio das vendas
-  return 450.75; // Implemente a lógica real do banco de dados
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const ticket = await prisma.overview.findUnique({
+    where: {
+      id: id
+    },
+  });
+
+  return ticket?.averageTicket || 0;
 }
 
-export async function getProdutosMaisVendidos() {
-  // Retorna os top 5 produtos mais vendidos - Nome até 8 caracteres
-  return [
-    { nome: 'A', quantidade: 150, fill: 'hsl(var(--chart-1))' },
-    { nome: 'B', quantidade: 120, fill: 'hsl(var(--chart-2))' },
-    { nome: 'C', quantidade: 198, fill: 'hsl(var(--chart-3))' },
-    { nome: 'D', quantidade: 67, fill: 'hsl(var(--chart-4))' },
-    { nome: 'E', quantidade: 245, fill: 'hsl(var(--chart-5))' }
-  ];
+export async function getProdutosMaisVendidos(): Promise<{ nome: string, quantidade: number, fill: string }[]> {
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const sales = await prisma.overview.findUnique({
+    where: {
+      id: id
+    },
+  });
+
+  const top5: { product: string, un: string, amount: number }[] = JSON.parse(JSON.stringify(sales?.top5BestSeller))
+  
+  return top5.map((product, index) => {
+    return {
+      nome: product.product,
+      quantidade: product.amount,
+      fill: 'hsl(var(--chart-'+(index+1)+'))'
+    }
+  }) || [];
+
+  // return [
+  //   { nome: 'A', quantidade: 150, fill: 'hsl(var(--chart-1))' },
+  //   { nome: 'B', quantidade: 120, fill: 'hsl(var(--chart-2))' },
+  //   { nome: 'C', quantidade: 198, fill: 'hsl(var(--chart-3))' },
+  //   { nome: 'D', quantidade: 67, fill: 'hsl(var(--chart-4))' },
+  //   { nome: 'E', quantidade: 245, fill: 'hsl(var(--chart-5))' }
+  // ];
 }
 
 export async function getClientesInativos() {
-  // Clientes sem compras nos últimos 30 dias
-  return 45; // Implemente a lógica real
+  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
+
+  const customer = await prisma.overview.findUnique({
+    where: {
+      id: id
+    },
+  });
+
+  return customer?.inactiveCustomers || 0; // Implemente a lógica real
 }
 
-export async function getTaxaConversao() {
-  // Taxa de conversão de visitas em vendas
-  return 23.5; // Implemente a lógica real
-}
+// export async function getTaxaConversao() {
+//   // Taxa de conversão de visitas em vendas
+//   return 23.5; // Implemente a lógica real
+// }
 
 export async function getLucratividade() {
   // Percentual de lucro médio

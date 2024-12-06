@@ -50,11 +50,13 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
 
   const CustomTooltip = ({ active, payload, label }: { active: boolean; payload: { value: number }[]; label: string }) => {
     if (active && payload && payload.length) {
+      const quantity = Intl.NumberFormat('pt-BR').format(Number(payload[0].value.toFixed(2)))
+      
       return (
         <Card className="p-3">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="text-sm font-bold text-foreground">
-            {payload[0].value} unidades
+            {quantity} unidades
           </p>
         </Card>
       );
@@ -81,7 +83,8 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
               dataKey="nome"
               type="category"
               stroke={'hsl(var(--foreground))'}
-              tick={{ fontSize: 12, fontFamily: 'Quicksand' }}
+              tick={{ fontSize: 11, fontFamily: 'Quicksand' }}
+              tickFormatter={(label) => `${label.slice(0, 10)}`}
               tickLine={false}
               axisLine={false}
             />
@@ -89,7 +92,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
               dataKey="quantidade"
               type="number"
               stroke={'hsl(var(--foreground))'}
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 12, fontFamily: 'Quicksand' }}
               tickFormatter={(value) => `${value} un`}
               tickLine={false}
               axisLine={false}
