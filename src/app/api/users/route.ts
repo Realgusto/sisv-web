@@ -26,9 +26,9 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json(users)
-    } catch (error) {
-        console.error('Erro ao buscar usuários: ', error)
-        return NextResponse.json({ error: 'Erro ao buscar usuários: ' + error }, { status: 500 })
+    } catch (err) {
+        console.error('Erro ao buscar usuários: ' + err)
+        return NextResponse.json({ error: 'Erro ao buscar usuários: ' + err }, { status: 500 })
     } finally {
         await prisma.$disconnect()
     }
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
         })
         return NextResponse.json(newUser, { status: 201 })
     } catch (error) {
-        console.error('Erro ao criar usuário: ', error)
+        console.error('Erro ao criar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao criar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -67,7 +67,7 @@ export async function PUT(request: Request) {
         })
         return NextResponse.json(updatedUser)
     } catch (error) {
-        console.error('Erro ao editar usuário: ', error)
+        console.error('Erro ao editar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao editar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -82,7 +82,7 @@ export async function DELETE(request: Request) {
         })
         return NextResponse.json({ id: id, message: 'Usuário deletado com sucesso' })
     } catch (error) {
-        console.error('Erro ao deletar usuário: ', error)
+        console.error('Erro ao deletar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao deletar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
