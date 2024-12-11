@@ -5,11 +5,13 @@ import { useTheme } from 'next-themes'
 import { Card } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { cn } from '@/lib/utils'
+import { format } from '@/utils'
 
 interface TopProductsChartProps {
   data: Array<{
     nome: string;
     quantidade: number;
+    unidade: string;
     fill: string;
   }>;
 }
@@ -54,7 +56,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
         <Card className="p-3">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="text-sm font-bold text-foreground">
-            {payload[0].value} unidades
+            {format(payload[0].value, false)} { data.find((prod) => prod.nome === label)?.unidade }
           </p>
         </Card>
       );
@@ -69,7 +71,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
             width={dimensions.width}
             height={dimensions.height}
             data={data}
-            margin={{ top: 16, right: 2, left: -10, bottom: 10 }}
+            margin={{ top: 16, right: 2, left: 0, bottom: 10 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -81,7 +83,8 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
               dataKey="nome"
               type="category"
               stroke={'hsl(var(--foreground))'}
-              tick={{ fontSize: 12, fontFamily: 'Quicksand' }}
+              tick={{ fontSize: 11, fontFamily: 'Quicksand' }}
+              tickFormatter={(label) => `${label.slice(0, 7)}`}
               tickLine={false}
               axisLine={false}
             />
@@ -89,8 +92,8 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
               dataKey="quantidade"
               type="number"
               stroke={'hsl(var(--foreground))'}
-              tick={{ fontSize: 12 }}
-              tickFormatter={(value) => `${value} un`}
+              tick={{ fontSize: 12, fontFamily: 'Quicksand' }}
+              tickFormatter={(value) => `${format(value, false)}`}
               tickLine={false}
               axisLine={false}
             />

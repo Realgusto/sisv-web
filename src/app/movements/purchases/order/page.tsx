@@ -49,10 +49,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Purchase } from '@prisma/client'
+import { Purchase, Status } from '@prisma/client'
 import { Combobox } from '@/components/ui/combobox'
+import { useUser } from '@/contexts/UserContext'
 
 export default function Order() {
+    const { user } = useUser();
+    
     const [orders, setOrders] = useState<Purchase[]>([])
     const [isDialogOpen, setDialogOpen] = useState(false)
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
@@ -64,11 +67,12 @@ export default function Order() {
         id: '',
         date: new Date(),
         delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
+        user_id: user ? user.id : '',
         supplier: '',
         product: '',
         quantity: 0,
         value: 0,
-        status: 'Solicitada',
+        status: Status.Aberta,
         department: '',
         observations: ''
     })
@@ -78,11 +82,12 @@ export default function Order() {
             id: '',
             date: new Date(),
             delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
+            user_id: user ? user.id : '',
             supplier: '',
             product: '',
             quantity: 0,
             value: 0,
-            status: 'Solicitada',
+            status: Status.Aberta,
             department: '',
             observations: ''
         })
@@ -94,11 +99,12 @@ export default function Order() {
             id: '',
             date: new Date(),
             delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
+            user_id: user ? user.id : '',
             supplier: '',
             product: '',
             quantity: 0,
             value: 0,
-            status: 'Solicitada',
+            status: Status.Aberta,
             department: '',
             observations: ''
         })
@@ -128,10 +134,10 @@ export default function Order() {
             const data = await response.json()
             setOrders(prevOrders => prevOrders.filter(order => order.id !== data.id));
             toast.success(data.message, {
-                // description: "Você pode restaurar a ordem em 30 dias",
+                // description: "Clique aqui se deseja restaurar a ordem",
                 // action: {
-                    //   label: "Desfazer",
-                    //   onClick: () => console.log("Desfazer"),
+                    //   label: "Restaurar",
+                    //   onClick: () => console.log("Restaurar"),
                 // },
             })
             setIsAlertDialogOpen(false)
@@ -156,8 +162,9 @@ export default function Order() {
         const newOrder: Purchase = {
             id: currentOrder.id !== '' ? currentOrder.id : uuidv4(),
             date: currentOrder.id !== '' ? currentOrder.date : new Date(),
+            user_id: user ? user.id : '',
             supplier: currentOrder.supplier,
-            status: currentOrder.id !== '' ? currentOrder.status : 'Solicitada',
+            status: currentOrder.id !== '' ? currentOrder.status : Status.Aberta,
             value: currentOrder.value,
             delivery_date: currentOrder.delivery_date,
             product: currentOrder.product,
@@ -197,10 +204,13 @@ export default function Order() {
 
     useEffect(() => {
         const fetchOrders = async () => {
-            setIsLoading(true);
+            setIsLoading(true)
             try {
-                const response = await fetch('/api/purchases', {
+                const response = await fetch('/api/purchases?page=order', {
                     method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
                 })
 
                 if (!response.ok) {
@@ -232,7 +242,7 @@ export default function Order() {
                 </Button>
             </div>
             <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
-                <TableCaption className="select-none">Uma lista das suas ordens de compra.</TableCaption>
+                <TableCaption className="select-none">{orders.length > 0 || isLoading ? 'Uma lista das suas ordens de compra.' : 'Nenhum registro por aqui...'}</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>
@@ -269,7 +279,7 @@ export default function Order() {
                                 <Skeleton className="h-10 w-full rounded-lg" />
                             </TableCell>
                         </TableRow>
-                     : 
+                     :
                         orders.map(order => (
                             <TableRow key={order.id} className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
                                 <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
@@ -341,7 +351,7 @@ export default function Order() {
                                 style: 'currency',
                                 currency: 'BRL',
                             }).format(orders.reduce((total, order) => {
-                                if (order.status === 'Aprovada' || order.status === 'Recebida') {
+                                if (order.status === Status.Faturada || order.status?.startsWith('Pedido')) {
                                     return total + (order.quantity * (order.value || 0))
                                 }
                                 return total

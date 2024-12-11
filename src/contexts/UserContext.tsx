@@ -6,9 +6,9 @@ import { TOKEN_KEY } from '@/constants'
 import { useRouter } from 'next/navigation'
 
 export interface User {
-  id: number
+  id: string
   name: string
-  token: string
+  email: string
 }
 
 interface UserContextType {
@@ -25,22 +25,35 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    try {
-      const cookie = Cookies.get(TOKEN_KEY)
-      
-      if (cookie) {
-        setUser({ id: 1, name: 'Augusto', token: cookie })
-      } else {
-        push('/login')
+    (async() => {
+      try {
+        const id = Cookies.get(TOKEN_KEY)
+              
+        if (id) {
+          const res = await fetch('/api/users?id='+id, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          })
+          const user: User | null = res.ok ? await res.json() : null
+
+          if (user) {
+            setUser(user)
+            push('/dashboard')
+          }
+        } else {
+          push('/login')
+        }
+      } catch (error) {
+        console.error('Erro ao buscar usuário logado: ', error)
       }
-    } catch (error) {
-      console.error('Erro ao obter cookie: ', error)
-    }
+    })()
   }, [push])
 
   const login = (userData: User) => {
     setUser(userData)
-    const ret = Cookies.set(TOKEN_KEY, userData.token, { expires: 1 })
+    const ret = Cookies.set(TOKEN_KEY, userData.id, { expires: 1 })
     if (ret !== '') {
       push('/dashboard')
     }

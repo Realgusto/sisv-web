@@ -12,6 +12,7 @@ import {
 import { Card } from '@/components/ui/card'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { format } from '@/utils'
 
 interface VendasMensais {
   mes: string
@@ -53,29 +54,13 @@ export function SalesChart({ data }: SalesChartProps) {
     return <div className={cn(CONTAINER_HEIGHT, 'w-full')} />
   }
 
-  const formatCurrency = (value: number) => {
-    if (value >= 1000) {
-      const abbreviated = (value / 1000).toFixed(1)
-      // Remove o .0 quando não há decimais
-      const finalValue = abbreviated.endsWith('.0') 
-        ? abbreviated.slice(0, -2) 
-        : abbreviated
-      return `R$ ${finalValue}K`
-    }
-    
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value)
-  }
-
   const CustomTooltip = ({ active, payload, label }: { active: boolean; payload: { value: number }[]; label: string }) => {
     if (active && payload && payload.length) {
       return (
         <Card className="p-3">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="text-sm font-bold text-foreground">
-            {formatCurrency(payload[0].value)}
+            {format(payload[0].value)}
           </p>
         </Card>
       )
@@ -90,7 +75,7 @@ export function SalesChart({ data }: SalesChartProps) {
           width={dimensions.width}
           height={dimensions.height}
           data={data}
-          margin={{ top: 16, right: 2, left: -10, bottom: 10 }}
+          margin={{ top: 16, right: 2, left: 0, bottom: 10 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"
@@ -109,7 +94,7 @@ export function SalesChart({ data }: SalesChartProps) {
           <YAxis
             stroke={'hsl(var(--foreground))'}
             tick={{ fontSize: 12 }}
-            tickFormatter={formatCurrency}
+            tickFormatter={(value) => format(value)}
             tickLine={false}
             axisLine={false}
           />
