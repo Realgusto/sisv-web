@@ -9,7 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-context-menu": "^2.2.2",
     "@radix-ui/react-dialog": "^1.1.2",

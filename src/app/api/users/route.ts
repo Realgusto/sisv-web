@@ -65,7 +65,6 @@ export async function POST(request: Request) {
         return NextResponse.json(newUser, { status: 201 })
     } catch (error) {
         console.error('Erro ao criar usuário: ' + error)
-        console.error('Erro ao criar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao criar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -87,7 +86,6 @@ export async function PUT(request: Request) {
         return NextResponse.json(updatedUser)
     } catch (error) {
         console.error('Erro ao editar usuário: ' + error)
-        console.error('Erro ao editar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao editar usuário: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect()
@@ -102,7 +100,6 @@ export async function DELETE(request: Request) {
         })
         return NextResponse.json({ id: id, message: 'Usuário deletado com sucesso' })
     } catch (error) {
-        console.error('Erro ao deletar usuário: ' + error)
         console.error('Erro ao deletar usuário: ' + error)
         return NextResponse.json({ error: 'Erro ao deletar usuário: ' + error }, { status: 500 })
     } finally {
