@@ -204,10 +204,13 @@ export default function Order() {
 
     useEffect(() => {
         const fetchOrders = async () => {
-            setIsLoading(true);
+            setIsLoading(true)
             try {
-                const response = await fetch('/api/purchases', {
+                const response = await fetch('/api/purchases?page=order', {
                     method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
                 })
 
                 if (!response.ok) {
@@ -239,7 +242,7 @@ export default function Order() {
                 </Button>
             </div>
             <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
-                <TableCaption className="select-none">Uma lista das suas ordens de compra.</TableCaption>
+                <TableCaption className="select-none">{orders.length > 0 || isLoading ? 'Uma lista das suas ordens de compra.' : 'Nenhum registro por aqui...'}</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>
@@ -276,7 +279,7 @@ export default function Order() {
                                 <Skeleton className="h-10 w-full rounded-lg" />
                             </TableCell>
                         </TableRow>
-                     : 
+                     :
                         orders.map(order => (
                             <TableRow key={order.id} className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
                                 <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>

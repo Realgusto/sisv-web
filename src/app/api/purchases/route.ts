@@ -8,9 +8,22 @@ import {
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(request: Request) {
+    const url = new URL(request.url)
+    const page = url.searchParams.get('page')
+
+    let purchases: Purchase[]
+
     try {
-        const purchases: Purchase[] = await prisma.purchase.findMany();
+        if (page === 'order') {
+            purchases = await prisma.purchase.findMany({
+                where: {
+                    status: { notIn: [Status.Aberta, Status.Cancelada] }
+                }
+            })
+        } else {
+            purchases = await prisma.purchase.findMany()
+        }
         
         if (!purchases) {
             NextResponse.json({ error: 'Nenhuma ordem encontrada' }, { status: 404 });

@@ -5,11 +5,13 @@ import { useTheme } from 'next-themes'
 import { Card } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { cn } from '@/lib/utils'
+import { format } from '@/utils'
 
 interface TopProductsChartProps {
   data: Array<{
     nome: string;
     quantidade: number;
+    unidade: string;
     fill: string;
   }>;
 }
@@ -50,13 +52,11 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
 
   const CustomTooltip = ({ active, payload, label }: { active: boolean; payload: { value: number }[]; label: string }) => {
     if (active && payload && payload.length) {
-      const quantity = Intl.NumberFormat('pt-BR').format(Number(payload[0].value.toFixed(2)))
-      
       return (
         <Card className="p-3">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="text-sm font-bold text-foreground">
-            {quantity} unidades
+            {format(payload[0].value, false)} { data.find((prod) => prod.nome === label)?.unidade }
           </p>
         </Card>
       );
@@ -93,7 +93,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
               type="number"
               stroke={'hsl(var(--foreground))'}
               tick={{ fontSize: 12, fontFamily: 'Quicksand' }}
-              tickFormatter={(value) => `${value} un`}
+              tickFormatter={(value) => `${format(value, false)}`}
               tickLine={false}
               axisLine={false}
             />

@@ -1,38 +1,51 @@
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Package, DollarSign, Users, ShoppingCart, UserMinus, PieChart } from 'lucide-react'
 
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { SalesChart } from '@/components/SalesChart'
-import { 
-  getClientesAtivos,
-  getCrescimentoMensal,
-  getProdutosEmEstoque,
-  getTotalVendasMes,
-  getVendasUltimos12Meses,
-  getTicketMedio,
-  getClientesInativos,
-  getLucratividade,
-  getProdutosMaisVendidos } from '@/lib/metrics'
 import { TopProductsChart } from '@/components/TopProductsChart'
 import { cn } from '@/lib/utils'
+import { getMetrics, getCrescimentoMensal } from '@/lib/metrics'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 export default async function Dashboard() {
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
-  const totalVendasMes = await getTotalVendasMes();
-  const clientesAtivos = await getClientesAtivos();
-  const produtosEmEstoque = await getProdutosEmEstoque();
-  const crescimentoMensal = await getCrescimentoMensal();
+  let overview: MetricsType = {} as MetricsType
+  let crescimentoMensal = 0
+  let vendasMes: VendasMensais[] = []
+  let topFive: bestSeller[] = []
+  
+  const produtosEmEstoque = 0;
+  const lucratividade = 2;
 
-  const dadosVendas = await getVendasUltimos12Meses();
+  overview = await getMetrics()
+  crescimentoMensal = getCrescimentoMensal(overview?.salesLastYear || [])
+  
+  const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
+  const sales = lastYear.map((sales) => {
+    return {
+      mes: format(new Date(new Date().getFullYear(), sales.mth - 1), 'MMMM', { locale: ptBR }),
+      valor: sales.tot_sales,
+    } 
+  }) || [];
 
-  const ticketMedio = await getTicketMedio();
-  const clientesInativos = await getClientesInativos();
-  // const taxaConversao = await getTaxaConversao();
-  const lucratividade = await getLucratividade();
+  vendasMes = sales
 
-  const produtosMaisVendidos = await getProdutosMaisVendidos();
+  const top5: { product: string, un: string, amount: number }[] = JSON.parse(JSON.stringify(overview?.top5BestSeller))
 
+  const bestSeller = top5.map((product, index) => {
+    return {
+      nome: product.product,
+      unidade: product.un,
+      quantidade: product.amount,
+      fill: 'hsl(var(--chart-'+(index+1)+'))'
+    }
+  }) || []
+
+  topFive = bestSeller
+  
   return (
     <div className="p-6 space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -46,7 +59,7 @@ export default async function Dashboard() {
               {Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
-              }).format(totalVendasMes)}
+              }).format(overview?.salesMonthly || 0)}
             </div>
             <CardDescription className="mt-2">
               <span className={crescimentoMensal >= 0 ? "text-green-500" : "text-red-500"}>
@@ -63,7 +76,7 @@ export default async function Dashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(clientesAtivos)}</div>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(overview?.activeCustomers || 0)}</div>
           </CardContent>
         </Card>
 
@@ -100,7 +113,7 @@ export default async function Dashboard() {
               {Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
-              }).format(ticketMedio)}
+              }).format(overview?.averageTicket || 0)}
             </div>
             <CardDescription className="mt-2">
               Ticket médio é calculado dividindo o faturamento total pelo número total de vendas realizadas no mês.
@@ -114,7 +127,7 @@ export default async function Dashboard() {
             <UserMinus className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(clientesInativos)}</div>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(overview?.inactiveCustomers || 0)}</div>
             <CardDescription className="mt-2">
               Últimos 30 dias
             </CardDescription>
@@ -151,7 +164,7 @@ export default async function Dashboard() {
             <CardTitle className="text-xl font-bold">Vendas dos Últimos 12 Meses</CardTitle>
           </CardHeader>
           <CardContent className={cn(CONTAINER_HEIGHT, 'w-full')}>
-            <SalesChart data={dadosVendas} />
+            <SalesChart data={vendasMes} />
           </CardContent>
         </Card>
 
@@ -160,7 +173,7 @@ export default async function Dashboard() {
             <CardTitle className="text-xl font-bold">Top 5 Produtos Mais Vendidos</CardTitle>
           </CardHeader>
           <CardContent className={cn(CONTAINER_HEIGHT, 'w-full')}>
-            <TopProductsChart data={produtosMaisVendidos} />
+            <TopProductsChart data={topFive} />
           </CardContent>
         </Card>
       </div>

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     try {
         const overview: Overview | null = await prisma.overview.findUnique({
             where: {
-                id: '122024'
+                id: id
             }
         });
         
