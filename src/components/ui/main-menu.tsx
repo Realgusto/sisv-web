@@ -75,7 +75,7 @@ const MainMenu = () => {
                     </MenubarSubTrigger>
                     <MenubarSubContent>
                       <MenubarItem onClick={() => {
-                        // push('/movements/purchases/budget')
+                        push('/movements/purchases/budget')
                       }}>
                         <ClipboardIcon className="mr-3" size={16}/> Orçamentos
                       </MenubarItem>
