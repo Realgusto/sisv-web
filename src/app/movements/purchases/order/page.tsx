@@ -22,7 +22,7 @@ import {
     DialogFooter
 } from '@/components/ui/dialog'
 import { v4 as uuidv4 } from 'uuid'
-import { CalendarIcon, Edit, MoreVertical, Plus, Trash, X } from 'lucide-react'
+import { CalendarIcon, Edit, MoreVertical, PackageX, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
     Popover,
@@ -59,23 +59,12 @@ export default function Order() {
     const [orders, setOrders] = useState<Purchase[]>([])
     const [isDialogOpen, setDialogOpen] = useState(false)
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
-    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [currentOrder, setCurrentOrder] = useState<Purchase>({
-        id: '',
-        date: new Date(),
-        delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
-        user_id: user ? user.id : '',
-        supplier: '',
-        product: '',
-        quantity: 0,
-        value: 0,
-        status: Status.Aberta,
-        department: '',
-        observations: ''
-    })
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [visualize, setVisualize] = useState(false)
+    const [currentOrder, setCurrentOrder] = useState<Purchase | null>(null)
 
     const handleOpenDialog = (order: Purchase | null = null) => {
         setCurrentOrder(order || {
@@ -89,7 +78,8 @@ export default function Order() {
             value: 0,
             status: Status.Aberta,
             department: '',
-            observations: ''
+            observations: '',
+            updated_at: null
         })
         setDialogOpen(true)
     }
@@ -106,9 +96,17 @@ export default function Order() {
             value: 0,
             status: Status.Aberta,
             department: '',
-            observations: ''
+            observations: '',
+            updated_at: null
         })
         setDialogOpen(false)
+        setVisualize(false)
+    }
+
+    const handleItemDoubleClick = async (order: Purchase) => {
+        setCurrentOrder(order)
+        setVisualize(true)
+        setDialogOpen(true)
     }
 
     const handleOpenAlertDialog = (order: Purchase) => {
@@ -124,11 +122,11 @@ export default function Order() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: currentOrder.id })
+                body: JSON.stringify({ id: currentOrder?.id })
             })
 
             if (!response.ok) {
-                throw new Error('Erro ao deletar a ordem: ' + response.statusText)
+                throw new Error('Erro ao cancelar a ordem: ' + response.statusText)
             }
 
             const data = await response.json()
@@ -143,7 +141,7 @@ export default function Order() {
             setIsAlertDialogOpen(false)
         } catch (error) {
             console.error(error)
-            alert('Ocorreu um erro ao apagar a ordem. Tente novamente mais tarde: ' + error)
+            alert('Ocorreu um erro ao cancelar a ordem. Tente novamente mais tarde: ' + error)
         } finally {
             setIsDeleting(false)
         }
@@ -152,6 +150,8 @@ export default function Order() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsSubmitting(true);
+
+        if (!currentOrder) return;
 
         if (currentOrder.department === null || currentOrder.department === '' || currentOrder.product === '' || currentOrder.quantity <= 0) {
             toast.error('Preencha todos os campos corretamente')
@@ -170,7 +170,8 @@ export default function Order() {
             product: currentOrder.product,
             quantity: currentOrder.quantity,
             department: currentOrder.department,
-            observations: currentOrder.observations
+            observations: currentOrder.observations,
+            updated_at: new Date()
         }
 
         try {
@@ -235,10 +236,10 @@ export default function Order() {
                 <h1 className="text-xl font-bold select-none sm:text-lg">Ordens de Compra</h1>
                 <Button 
                     onClick={() => handleOpenDialog()} 
-                    className="bg-blue-500 text-white hover:bg-blue-600"
+                    className="bg-primary text-white w-10 sm:w-36 hover:bg-primary/80"
                 >
                     <Plus className="h-5 w-5" />
-                    <span className="hidden sm:block ml-2">Adicionar Ordem</span>
+                    <span className="hidden sm:block ml-2">Ordem</span>
                 </Button>
             </div>
             <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
@@ -281,7 +282,7 @@ export default function Order() {
                         </TableRow>
                      :
                         orders.map(order => (
-                            <TableRow key={order.id} className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
+                            <TableRow key={order.id} onDoubleClick={() => handleItemDoubleClick(order)} className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
                                 <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
                                 <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
                                 <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{order.department ? order.department : 'N . D'}</TableCell>
@@ -308,7 +309,7 @@ export default function Order() {
                                                 <Edit className="h-3 w-3 mr-2" /> Editar
                                             </DropdownMenuItem>
                                             <DropdownMenuItem className="text-red-400 hover:text-red-500" onClick={() => handleOpenAlertDialog(order)}>
-                                                <Trash className="h-3 w-3 mr-2" /> Apagar
+                                                <PackageX className="h-3 w-3 mr-2" /> Cancelar
                                             </DropdownMenuItem>                                            
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -317,11 +318,9 @@ export default function Order() {
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Esta ação é irreversível e irá deletar a ordem permanentemente.
-                                                    <br />
-                                                    Produto: { currentOrder.product }
-                                                    <br />
-                                                    Setor: { currentOrder.department }
+                                                    Deseja cancelar a ordem de compra?
+                                                    { currentOrder?.product && <><br />Produto: {currentOrder.product}</> }
+                                                    { currentOrder?.department && <><br />Setor: {currentOrder.department}</> }
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
@@ -333,7 +332,7 @@ export default function Order() {
                                                     onClick={() => handleDeleteOrder()}
                                                     disabled={isDeleting}
                                                 >
-                                                    {isDeleting ? 'Apagando...' : <><Trash className="h-3 w-3 mr-2" /> Apagar</>}
+                                                    {isDeleting ? 'Cancelando...' : <><PackageX className="h-3 w-3 mr-2" /> Cancelar</>}
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
@@ -366,109 +365,147 @@ export default function Order() {
                 <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
                     <DialogContent className="max-w-[350px] max-h-[450px] sm:max-w-[425px] sm:max-h-[720px] lg:max-h-none">
                         <DialogHeader>
-                            <DialogTitle className="text-lg sm:text-base">{currentOrder.id !== '' ? 'Editar Ordem' : 'Adicionar Ordem'}</DialogTitle>
-                            <DialogDescription className="text-sm sm:text-base">{currentOrder.id !== '' ? 'Faça alterações na ordem aqui. Clique em salvar quando terminar.' : 'Adicione uma nova ordem.'}</DialogDescription>
+                            <DialogTitle className="text-lg sm:text-base">
+                                {
+                                    visualize ?
+                                        'Visualizar Ordem' : 
+                                    currentOrder?.id !== '' ?
+                                        'Editar Ordem' :
+                                        'Adicionar Ordem'
+                                }
+                            </DialogTitle>
+                            <DialogDescription className="text-sm sm:text-base">
+                                {
+                                    visualize ?
+                                        'Visualize a ordem de compra.' :
+                                    currentOrder?.id !== '' ?
+                                        'Faça alterações na ordem aqui. Clique em salvar quando terminar.' :
+                                        'Adicione uma nova ordem.'
+                                }
+                            </DialogDescription>
                         </DialogHeader> 
-                        <form onSubmit={handleSubmit} className="space-y-4 max-h-64 sm:max-h-72 lg:max-h-80 xl:max-h-96 2xl:max-h-none overflow-y-auto">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Previsão de Entrega (Obrigatório)</label>
-                                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant={"secondary"}
-                                            className={cn(
-                                                "justify-start text-left font-normal w-full mt-1",
-                                                !currentOrder.delivery_date && "text-muted-foreground"
-                                            )}
-                                        >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {currentOrder.delivery_date ? new Date(currentOrder.delivery_date).toLocaleDateString('pt-BR') : <span>Selecione a previsão de entrega</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="p-0 w-full">
-                                        <Calendar
-                                            mode="single"
-                                            selected={new Date(currentOrder.delivery_date)}
-                                            onSelect={(date) => setCurrentOrder({ ...currentOrder, delivery_date: date || new Date() })}
-                                            initialFocus
-                                            locale={ptBR}
-                                            title="Selecione a data de entrega"
-                                            onDayClick={() => setIsPopoverOpen(false)}
-                                            required
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </div>                            
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Setor</label>
-                                <Combobox
-                                    value={currentOrder.department || ''}
-                                    onChange={(value) => {
-                                        setCurrentOrder({ ...currentOrder, department: value })
-                                        console.log(currentOrder.department)
-                                    }} 
-                                    className="mt-1 w-full rounded-md shadow-sm p-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Fornecedor</label>
-                                <input 
-                                    type="text" 
-                                    value={currentOrder.supplier || ''} 
-                                    onChange={(e) => setCurrentOrder({ ...currentOrder, supplier: e.target.value })} 
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                                    // required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Produto (Obrigatório)</label>
-                                <input 
-                                    type="text"
-                                    value={currentOrder.product}
-                                    onChange={(e) => setCurrentOrder({ ...currentOrder, product: e.target.value })} 
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Quantidade (Obrigatório)</label>
-                                <input 
-                                    type="number" 
-                                    value={currentOrder.quantity}
-                                    onChange={(e) => setCurrentOrder({ ...currentOrder, quantity: Number(e.target.value) })} 
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Valor</label>
-                                <input 
-                                    type="number" 
-                                    value={currentOrder.value || ''}
-                                    onChange={(e) => setCurrentOrder({ ...currentOrder, value: Number(e.target.value) })} 
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                                    // required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
-                                <Textarea
-                                    value={currentOrder.observations || ''}
-                                    onChange={(e) => setCurrentOrder({ ...currentOrder, observations: e.target.value })} 
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
+                        {   currentOrder && (
+                            <form onSubmit={handleSubmit} className="space-y-4 max-h-64 sm:max-h-72 lg:max-h-80 xl:max-h-96 2xl:max-h-none overflow-y-auto">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Previsão de Entrega</label>
+                                    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"secondary"}
+                                                className={cn(
+                                                    "justify-start text-left font-normal w-full mt-1",
+                                                    !currentOrder.delivery_date && "text-muted-foreground",
+                                                    visualize && 'cursor-not-allowed'
+                                                )}
+                                                disabled={visualize}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {currentOrder?.delivery_date ? new Date(currentOrder.delivery_date).toLocaleDateString('pt-BR') : <span>Selecione a previsão de entrega</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="p-0 w-full">
+                                            <Calendar
+                                                mode="single"
+                                                selected={new Date(currentOrder.delivery_date)}
+                                                onSelect={(date) => setCurrentOrder({ ...currentOrder, delivery_date: date || new Date() })}
+                                                initialFocus
+                                                locale={ptBR}
+                                                title="Selecione a data de entrega"
+                                                onDayClick={() => setIsPopoverOpen(false)}
+                                                required
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>                            
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Setor</label>
+                                    <Combobox
+                                        value={currentOrder.department || ''}
+                                        className={cn("mt-1 w-full rounded-md shadow-sm p-2", visualize && 'cursor-not-allowed')}
+                                        disabled={visualize}
+                                        onChange={(value) => {
+                                            if (visualize) {
+                                                toast.error('Para fazer alterações, saia do modo de visualização e entre no modo de edição clicando no botão "Editar"')
+                                            } else {
+                                                setCurrentOrder({ ...currentOrder, department: value })
+                                            }
+                                        }} 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Fornecedor</label>
+                                    <input 
+                                        type="text" 
+                                        value={currentOrder.supplier || ''} 
+                                        onChange={(e) => setCurrentOrder({ ...currentOrder, supplier: e.target.value })} 
+                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
+                                        required
+                                        disabled={visualize}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Produto</label>
+                                    <input 
+                                        type="text"
+                                        value={currentOrder.product}
+                                        onChange={(e) => setCurrentOrder({ ...currentOrder, product: e.target.value })} 
+                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
+                                        required
+                                        disabled={visualize}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Quantidade</label>
+                                    <input 
+                                        type="number" 
+                                        value={currentOrder.quantity}
+                                        onChange={(e) => setCurrentOrder({ ...currentOrder, quantity: Number(e.target.value) })} 
+                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
+                                        required
+                                        disabled={visualize}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Valor Unitário</label>
+                                    <input 
+                                        type="number" 
+                                        value={currentOrder.value || ''}
+                                        onChange={(e) => setCurrentOrder({ ...currentOrder, value: Number(e.target.value) })} 
+                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
+                                        required
+                                        disabled={visualize}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
+                                    <Textarea
+                                        value={currentOrder.observations || ''}
+                                        onChange={(e) => setCurrentOrder({ ...currentOrder, observations: e.target.value })} 
+                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
+                                        disabled={visualize}
+                                    />
+                                </div>
 
-                            <DialogFooter>
-                                <Button 
-                                    type="submit"
-                                    className={`bg-green-500 text-white hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Salvando...' : currentOrder.id !== '' ? 'Salvar Alterações' : 'Adicionar Ordem'}
-                                </Button>
-                            </DialogFooter>
-                        </form>
+                                <DialogFooter>
+                                    {   visualize ? 
+                                        <Button
+                                            className="bg-primary text-white hover:bg-primary/80"
+                                            onClick={handleCloseDialog}
+                                        >
+                                            Fechar
+                                        </Button>
+                                        :
+                                        <Button 
+                                            type="submit"
+                                            className={`bg-green-500 text-white hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? 'Salvando...' : currentOrder.id !== '' ? 'Salvar Alterações' : 'Adicionar Ordem'}
+                                        </Button>
+                                    }
+                                </DialogFooter>
+                            </form>
+                        )}
                     </DialogContent>
                 </Dialog>
             </div>
