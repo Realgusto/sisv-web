@@ -1,12 +1,11 @@
-'use client'
-
 import { useEffect } from "react";
 
 import { redirect } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 
 export default function Page() {
-    const user = useUser();
+    const user = useUser()
+    
     useEffect(() => {
         if (user) {
             redirect('/dashboard')

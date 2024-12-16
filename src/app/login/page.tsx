@@ -27,9 +27,11 @@ export default function LoginPage() {
       const response = await fetch('/api/users?email=' + email + '&password=' + md5(password.toUpperCase()), {
         method: 'GET',
         headers: {
+          'Authorization': 'e7a1d1b7-b9ff-4785-9d41-114d2789b1a0',
           'Content-Type': 'application/json',
         },
       })
+      console.log(response)
       const userData: UserType | null = response.ok ? await response.json() : null
       if (userData) {
         login(userData)
@@ -38,7 +40,7 @@ export default function LoginPage() {
       }
     } catch (error) {
       setError('Erro ao tentar fazer login')
-      console.error("Erro ao fazer login: ", error)
+      console.error("Erro ao fazer login: "+ error)
     } finally {
       setLoading(false)
     }

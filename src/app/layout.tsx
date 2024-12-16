@@ -1,5 +1,4 @@
 import "./globals.css"
-
 import type { Metadata } from "next"
 import { Quicksand, Rubik } from "next/font/google"
 import { Analytics } from "@vercel/analytics/react"
@@ -31,9 +30,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <body
@@ -52,9 +51,9 @@ export default function RootLayout({
           </UserProvider>
         </ThemeProvider>
         <Toaster />
+        <Analytics />
+        <SpeedInsights />
       </body>
-      <Analytics />
-      <SpeedInsights />
     </html>
   );
 }
