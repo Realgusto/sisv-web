@@ -27,7 +27,7 @@ export default function LoginPage() {
       const response = await fetch('/api/users?email=' + email + '&password=' + md5(password.toUpperCase()), {
         method: 'GET',
         headers: {
-          'Authorization': 'e7a1d1b7-b9ff-4785-9d41-114d2789b1a0',
+          // 'Authorization': 'e7a1d1b7-b9ff-4785-9d41-114d2789b1a0',
           'Content-Type': 'application/json',
         },
       })
