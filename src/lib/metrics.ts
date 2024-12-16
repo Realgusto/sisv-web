@@ -12,11 +12,13 @@ const MOCK_DATA = {
   })).reverse(),
 };
 
+export const baseURL = 'http://localhost:3000' // process.env.NEXT_PUBLIC_API_URL || 
+
 export async function getMetrics(): Promise<MetricsType> {
   const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
 
   try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/overview?id=${id}`, {
+      const response = await fetch(`${baseURL}/api/overview?id=${id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

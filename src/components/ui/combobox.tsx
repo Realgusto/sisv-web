@@ -49,10 +49,11 @@ const departments = [
 type ComboboxProps = {
   value?: string
   className?: string
+  disabled?: boolean
   onChange?: (value: string) => void
 }
 
-export function Combobox({ value: initialValue, className, onChange }: ComboboxProps) {
+export function Combobox({ value: initialValue, className, disabled, onChange }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState(initialValue || "")
 
@@ -64,10 +65,12 @@ export function Combobox({ value: initialValue, className, onChange }: ComboboxP
           role="combobox"
           aria-expanded={open}
           className={cn("w-[200px] justify-between", className)}
+          disabled={disabled}
         >
-          {value
-            ? departments.find((department) => department.value === value)?.label
-            : "Selecione o setor..."}
+          { value
+              ? departments.find((department) => department.value === value)?.label
+              : "Selecione o setor..."
+          }
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>

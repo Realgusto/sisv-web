@@ -22,5 +22,6 @@ interface MetricsType {
 interface bestSeller {
     nome: string;
     quantidade: number;
+    unidade: string;
     fill: string;
 }

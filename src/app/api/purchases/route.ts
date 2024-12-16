@@ -18,7 +18,13 @@ export async function GET(request: Request) {
         if (page === 'order') {
             purchases = await prisma.purchase.findMany({
                 where: {
-                    status: { notIn: [Status.Aberta, Status.Cancelada] }
+                    status: { notIn: [ Status.Aberta, Status.Cancelada ]}
+                }
+            })
+        } else if (page === 'budget') {
+            purchases = await prisma.purchase.findMany({
+                where: {
+                    status: Status.Aberta
                 }
             })
         } else {
@@ -93,22 +99,17 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
     const { id }: Purchase = await request.json();
     try {
-        // Verifica se o registro existe
-        const purchase = await prisma.purchase.findUnique({
+        await prisma.purchase.update({
             where: { id: id },
+            data: {
+                status: Status.Cancelada
+            }
         });
 
-        if (!purchase) {
-            return NextResponse.json({ error: 'Ordem não encontrada' }, { status: 404 });
-        }
-
-        await prisma.purchase.delete({
-            where: { id: id },
-        });
-        return NextResponse.json({ id: id, message: 'Ordem deletada com sucesso' });
+        return NextResponse.json({ id: id, message: 'Ordem cancelada com sucesso' });
     } catch (error) {
-        console.error('Erro ao deletar ordem: ' + error);
-        return NextResponse.json({ error: 'Erro ao deletar ordem: ' + error }, { status: 500 });
+        console.error('Erro ao cancelar ordem: ' + error);
+        return NextResponse.json({ error: 'Erro ao cancelar ordem: ' + error }, { status: 500 });
     } finally {
         await prisma.$disconnect();
     }
