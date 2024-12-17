@@ -5,21 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SalesChart } from '@/components/SalesChart'
 import { TopProductsChart } from '@/components/TopProductsChart'
 import { cn } from '@/lib/utils'
-import { getCrescimentoMensal } from '@/lib/metrics'
+import { getMetrics, getCrescimentoMensal } from '@/lib/metrics'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 export default async function Dashboard() {
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
-  const overview: MetricsType = {
-    activeCustomers: 0,
-    salesMonthly: 0,
-    salesLastYear: [],
-    top5BestSeller: [],
-    averageTicket: 0,
-    inactiveCustomers: 0
-  } as MetricsType
+  let overview: MetricsType = {} as MetricsType
   let crescimentoMensal = 0
   let vendasMes: VendasMensais[] = []
   let topFive: bestSeller[] = []
@@ -27,7 +20,7 @@ export default async function Dashboard() {
   const produtosEmEstoque = 0;
   const lucratividade = 2;
 
-  // overview = await getMetrics()
+  overview = await getMetrics()
   crescimentoMensal = getCrescimentoMensal(overview?.salesLastYear || [])
   
   const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
