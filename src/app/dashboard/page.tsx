@@ -12,7 +12,14 @@ import { ptBR } from 'date-fns/locale'
 export default async function Dashboard() {
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
-  const overview: MetricsType = {} as MetricsType
+  const overview: MetricsType = {
+    activeCustomers: 0,
+    salesMonthly: 0,
+    salesLastYear: [],
+    top5BestSeller: [],
+    averageTicket: 0,
+    inactiveCustomers: 0
+  } as MetricsType
   let crescimentoMensal = 0
   let vendasMes: VendasMensais[] = []
   let topFive: bestSeller[] = []
