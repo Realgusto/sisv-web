@@ -20,7 +20,7 @@ export default async function Dashboard() {
   const produtosEmEstoque = 0;
   const lucratividade = 2;
 
-  overview = await getMetrics()
+  // overview = await getMetrics()
   crescimentoMensal = getCrescimentoMensal(overview?.salesLastYear || [])
   
   const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
