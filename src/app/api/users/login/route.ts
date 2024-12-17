@@ -41,7 +41,7 @@ export async function POST(request: Request) {
                 }, { status: 401 })
         }
 
-        return NextResponse.json(users)
+        return NextResponse.json(users, { status: 200 })
     } catch (err) {
         console.error('Erro ao buscar usuários: ' + err)
         return NextResponse.json({ error: 'Erro ao buscar usuários: ' + err }, { status: 500 })

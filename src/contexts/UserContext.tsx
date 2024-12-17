@@ -30,11 +30,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const id = Cookies.get(TOKEN_KEY)
               
         if (id) {
-          const res = await fetch('/api/users?id='+id, {
-              method: 'GET',
+          const res = await fetch('/api/users/login', {
+              method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
-              }
+              },
+              body: JSON.stringify({ id })
           })
           const user: User | null = res.ok ? await res.json() : null
 

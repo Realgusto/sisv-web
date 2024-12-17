@@ -1,4 +1,4 @@
-interface VendasMensais {
+interface MonthlySales {
     mes: string;
     valor: number;
 }

@@ -21,7 +21,7 @@ export default async function Dashboard() {
     inactiveCustomers: 0
   } as MetricsType
   let crescimentoMensal = 0
-  let vendasMes: VendasMensais[] = []
+  let sales: MonthlySales[] = []
   let topFive: bestSeller[] = []
   
   const produtosEmEstoque = 0;
@@ -31,18 +31,16 @@ export default async function Dashboard() {
   crescimentoMensal = getCrescimentoMensal(overview?.salesLastYear || [])
   
   const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
-  const sales = lastYear.map((sales) => {
+  sales = lastYear.map((sales) => {
     return {
       mes: format(new Date(new Date().getFullYear(), sales.mth - 1), 'MMMM', { locale: ptBR }),
       valor: sales.tot_sales,
     } 
-  }) || [];
-
-  vendasMes = sales
+  }) || []
 
   const top5: { product: string, un: string, amount: number }[] = JSON.parse(JSON.stringify(overview?.top5BestSeller))
 
-  const bestSeller = top5.map((product, index) => {
+  topFive = top5.map((product, index) => {
     return {
       nome: product.product,
       unidade: product.un,
@@ -50,8 +48,6 @@ export default async function Dashboard() {
       fill: 'hsl(var(--chart-'+(index+1)+'))'
     }
   }) || []
-
-  topFive = bestSeller
   
   return (
     <div className="p-6 space-y-6 w-full max-w-full overflow-x-hidden">
@@ -171,7 +167,7 @@ export default async function Dashboard() {
             <CardTitle className="text-xl font-bold">Vendas dos Últimos 12 Meses</CardTitle>
           </CardHeader>
           <CardContent className={cn(CONTAINER_HEIGHT, 'w-full')}>
-            <SalesChart data={vendasMes} />
+            <SalesChart data={sales} />
           </CardContent>
         </Card>
 
