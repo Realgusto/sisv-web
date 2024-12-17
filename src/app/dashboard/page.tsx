@@ -5,14 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SalesChart } from '@/components/SalesChart'
 import { TopProductsChart } from '@/components/TopProductsChart'
 import { cn } from '@/lib/utils'
-import { getMetrics, getCrescimentoMensal } from '@/lib/metrics'
+import { getCrescimentoMensal } from '@/lib/metrics'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 export default async function Dashboard() {
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
-  let overview: MetricsType = {} as MetricsType
+  const overview: MetricsType = {} as MetricsType
   let crescimentoMensal = 0
   let vendasMes: VendasMensais[] = []
   let topFive: bestSeller[] = []
