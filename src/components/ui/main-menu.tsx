@@ -190,9 +190,13 @@ const MainMenu = () => {
                 <MenubarTrigger><MenuIcon size={24} /></MenubarTrigger>
                 <MenubarContent>
                   <MenubarItem onClick={() => {
-                    push('/dashboard')
+                    if (user.admin) {
+                      push('/dashboard')
+                    } else {
+                      push('/shortcuts')
+                    }
                   }}>
-                    <HomeIcon className="mr-3" size={16} /> Dashboard
+                    <HomeIcon className="mr-3" size={16} /> Home
                   </MenubarItem>                  
                   <MenubarSeparator />
                   <MenubarSub>

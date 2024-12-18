@@ -4,12 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import Cookies from 'js-cookie'
 import { TOKEN_KEY } from '@/constants'
 import { useRouter } from 'next/navigation'
-
-export interface User {
-  id: string
-  name: string
-  email: string
-}
+import { User } from '@prisma/client'
 
 interface UserContextType {
   user: User | null
@@ -30,18 +25,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const id = Cookies.get(TOKEN_KEY)
               
         if (id) {
-          const res = await fetch('/api/users/login', {
-              method: 'POST',
+          const res = await fetch('/api/users?id='+id, {
+              method: 'GET',
               headers: {
                   'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ id })
+              }
           })
           const user: User | null = res.ok ? await res.json() : null
 
           if (user) {
+            if (user.admin) {
+              push('/dashboard')
+            } else {
+              push('/shortcuts')
+            }
             setUser(user)
-            push('/dashboard')
           }
         } else {
           push('/login')
@@ -53,11 +51,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [push])
 
   const login = (userData: User) => {
-    setUser(userData)
     const ret = Cookies.set(TOKEN_KEY, userData.id, { expires: 1 })
     if (ret !== '') {
-      push('/dashboard')
+      if (userData.admin) {
+        push('/dashboard')
+      } else {
+        push('/shortcuts')
+      }
     }
+    setUser(userData)
   };
 
   const logout = () => {

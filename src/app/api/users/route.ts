@@ -4,6 +4,30 @@ import { PrismaClient, User } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+export async function GET(request: Request) {
+    const url = new URL(request.url)
+    const id = url.searchParams.get('id')
+
+    try {
+        if (!id) {
+            return NextResponse.json({ message: 'O campo "ID" é obrigatório' }, { status: 400 })
+        }
+
+        const users = await prisma.user.findUnique({ where: { id } })
+        
+        if (!users) {
+            return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 401 })
+        }
+
+        return NextResponse.json(users, { status: 200 })
+    } catch (err) {
+        console.error('Erro ao buscar usuários: ' + err)
+        return NextResponse.json({ error: 'Erro ao buscar usuários: ' + err }, { status: 500 })
+    } finally {
+        await prisma.$disconnect()
+    }
+}
+
 export async function POST(request: Request) {
     const data: User = await request.json()
     try {

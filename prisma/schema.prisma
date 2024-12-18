@@ -13,6 +13,7 @@ model User {
   name      String
   email     String     @unique
   password  String
+  admin     Boolean    @default(false)
   purchases Purchase[] @relation("UserPurchases")
 }
 
