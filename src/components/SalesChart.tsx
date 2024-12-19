@@ -14,13 +14,8 @@ import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { format } from '@/utils'
 
-interface VendasMensais {
-  mes: string
-  valor: number
-}
-
 interface SalesChartProps {
-  data: VendasMensais[]
+  data: MonthlySales[]
 }
 
 export function SalesChart({ data }: SalesChartProps) {
@@ -29,7 +24,7 @@ export function SalesChart({ data }: SalesChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 1700, height: 450 })
   const [mounted, setMounted] = useState(false)
-  
+
   useEffect(() => {
     setMounted(true)
     

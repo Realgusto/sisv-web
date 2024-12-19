@@ -37,7 +37,7 @@ const MainMenu = () => {
           <>
             {/* Menu completo visível em telas médias e grandes */}
             <div className="hidden sm:flex flex-row">
-              <Link href="/dashboard" className="flex flex-row items-center ml-2">
+              <Link href={user.admin ? "/dashboard" : "/shortcuts"} className="flex flex-row items-center ml-2">
                 <FourEasyIcon height={30} width={30} />
                 <span className="sr-only">4Easy Tecnologia</span>
               </Link>

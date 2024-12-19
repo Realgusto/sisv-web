@@ -8,12 +8,7 @@ import { cn } from '@/lib/utils'
 import { format } from '@/utils'
 
 interface TopProductsChartProps {
-  data: Array<{
-    nome: string;
-    quantidade: number;
-    unidade: string;
-    fill: string;
-  }>;
+  data: bestSeller[]
 }
 
 const CONTAINER_HEIGHT = cn('h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] xl:h-[400px]')

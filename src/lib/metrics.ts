@@ -53,17 +53,10 @@ export async function getProdutosEmEstoque(): Promise<number> {
   return MOCK_DATA.produtosEstoque;
 }
 
-export function getCrescimentoMensal(lastYear: { mth: number, tot_sales: number }[]): number {
-  const mesAtual = new Date().getMonth() + 1
-  const mesAnterior = new Date().getMonth()
+export function getCrescimentoMensal(actualValue: number, pastValue: number) {
+  if (pastValue === 0) return 0;
 
-  // const lastYear: { mth: number, tot_sales: number }[] = JSON.parse(JSON.stringify(salesLastYear))
-  const valorAtual = lastYear.find((sales) => sales.mth === mesAtual) || { tot_sales: 0 };
-  const valorAnterior = lastYear.find((sales) => sales.mth === mesAnterior) || { tot_sales: 0 };
-
-  if (valorAnterior.tot_sales === 0) return 0;
-
-  return Math.round(((valorAtual.tot_sales - valorAnterior.tot_sales) / valorAnterior.tot_sales) * 100);
+  return Math.round(((actualValue - pastValue) / pastValue) * 100);
 
   // Versão com dados mocados
   // return Math.round(Math.random() * 40 - 20); // Crescimento variável com possibilidade de negativo

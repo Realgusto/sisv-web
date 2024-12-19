@@ -8,7 +8,7 @@ import {
 import { ExternalLink } from "lucide-react";
 
 export default function Shortcuts() {
-    const styleCard = "h-48 transition duration-400 ease-in-out transform hover:-translate-y-1 hover:shadow-sm hover:shadow-muted-foreground/75"
+    const styleCard = "h-48 transition duration-400 ease-in-out transform hover:-translate-y-1 hover:shadow-sm hover:shadow-muted-foreground/75 select-none hover:cursor-pointer"
     
     return (
         <div className="p-6 space-y-6 w-full max-w-full overflow-x-hidden">

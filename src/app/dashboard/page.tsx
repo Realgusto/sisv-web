@@ -28,7 +28,7 @@ export default async function Dashboard() {
   const lucratividade = 2;
 
   overview = await getMetrics()
-  crescimentoMensal = getCrescimentoMensal(overview?.salesLastYear || [])
+  crescimentoMensal = getCrescimentoMensal(overview.salesMonthly, overview.salesLastYear[11].tot_sales)
   
   const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
   sales = lastYear.map((sales) => {
@@ -80,6 +80,9 @@ export default async function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(overview?.activeCustomers || 0)}</div>
+            <CardDescription className="mt-2">
+              Últimos 30 dias
+            </CardDescription>
           </CardContent>
         </Card>
 
