@@ -1,3 +1,4 @@
+import FetchAPI from '@/utils/fetch-api';
 import { subMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -18,12 +19,18 @@ export async function getMetrics(): Promise<MetricsType> {
   const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
 
   try {
-      const response = await fetch(`${baseURL}/api/overview?id=${id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await FetchAPI({
+        URL: `${baseURL}/api/overview?id=${id}`,
+        method: 'GET'
       })
+
+      // const response = await fetch(`${baseURL}/api/overview?id=${id}`, {
+      //     method: 'GET',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       'Authorization': '430ec2fc-5060-414b-aa41-7747d507e892',
+      //     },
+      // })
 
       if (!response.ok) {
           throw new Error('Erro ao buscar dados: ' + response.statusText)
