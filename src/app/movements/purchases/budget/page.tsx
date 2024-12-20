@@ -52,6 +52,7 @@ import {
 import { Purchase, Status } from '@prisma/client'
 import { Combobox } from '@/components/ui/combobox'
 import { useUser } from '@/contexts/UserContext'
+import FetchAPI from '@/utils/fetch-api'
 
 export default function Budget() {
     const { user } = useUser()
@@ -134,13 +135,19 @@ export default function Budget() {
     const handleDeleteOrder = async () => {
         setIsDeleting(true)
         try {
-            const response = await fetch('/api/purchases', {
+            const response = await FetchAPI({
+                URL: '/api/purchases',
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify({ id: currentOrder?.id })
             })
+
+            // const response = await fetch('/api/purchases', {
+            //     method: 'DELETE',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({ id: currentOrder?.id })
+            // })
 
             if (!response.ok) {
                 throw new Error('Erro ao cancelar o orçamento: ' + response.statusText)
@@ -207,13 +214,20 @@ export default function Budget() {
 
         try {
             const method = currentOrder?.id ? 'PUT' : 'POST';
-            const response = await fetch('/api/purchases', {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+            
+            const response = await FetchAPI({
+                URL: '/api/purchases',
+                method,
                 body: JSON.stringify(newOrder)
             })
+
+            // const response = await fetch('/api/purchases', {
+            //     method: method,
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify(newOrder)
+            // })
 
             if (!response.ok) {
                 throw new Error('Erro ao salvar o orçamento: ' + response.statusText);
@@ -244,12 +258,17 @@ export default function Budget() {
         const fetchOrders = async () => {
             setIsLoading(true)
             try {
-                const response = await fetch('/api/purchases?page=budget', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                const response = await FetchAPI({
+                    URL: '/api/purchases?page=budget',
+                    method: 'GET'
                 })
+
+                // const response = await fetch('/api/purchases?page=budget', {
+                //     method: 'GET',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     },
+                // })
 
                 if (!response.ok) {
                     throw new Error('Erro ao buscar ordens: ' + response.statusText)

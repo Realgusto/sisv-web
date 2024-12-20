@@ -8,6 +8,7 @@ import { useUser } from '@/contexts/UserContext'
 import { User as UserType } from '@prisma/client'
 import FourEasyIcon from '@/components/FourEasyIcon'
 import md5 from 'md5'
+import FetchAPI from '@/utils/fetch-api'
 
 export default function LoginPage() {
   const { login } = useUser()
@@ -25,14 +26,21 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/users/login', {
+      const response = await FetchAPI({ 
+        URL: '/api/users/login',
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email, password: md5(password.toUpperCase()) })
       })
-      console.log(response)
+
+      // const response = await fetch('/api/users/login', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': '430ec2fc-5060-414b-aa41-7747d507e892',
+      //   },
+      //   body: JSON.stringify({ email, password: md5(password.toUpperCase()) })
+      // })
+
       const userData: UserType | null = response.ok ? await response.json() : null
       if (userData) {
         login(userData)
@@ -41,7 +49,7 @@ export default function LoginPage() {
       }
     } catch (error) {
       setError('Erro ao tentar fazer login')
-      console.error("Erro ao fazer login: "+ error)
+      console.error("Erro ao fazer login: " + error)
     } finally {
       setLoading(false)
     }

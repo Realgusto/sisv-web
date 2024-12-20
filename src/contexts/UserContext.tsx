@@ -28,7 +28,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           const res = await fetch('/api/users?id='+id, {
               method: 'GET',
               headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Authorization': '430ec2fc-5060-414b-aa41-7747d507e892',
               }
           })
           const user: User | null = res.ok ? await res.json() : null
