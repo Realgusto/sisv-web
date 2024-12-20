@@ -32,15 +32,6 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password: md5(password.toUpperCase()) })
       })
 
-      // const response = await fetch('/api/users/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': '430ec2fc-5060-414b-aa41-7747d507e892',
-      //   },
-      //   body: JSON.stringify({ email, password: md5(password.toUpperCase()) })
-      // })
-
       const userData: UserType | null = response.ok ? await response.json() : null
       if (userData) {
         login(userData)

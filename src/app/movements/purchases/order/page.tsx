@@ -122,15 +122,7 @@ export default function Order() {
                 URL: '/api/purchases',
                 method: 'DELETE',
                 body: JSON.stringify({ id: currentOrder?.id })
-            })            
-
-            // const response = await fetch('/api/purchases', {
-            //     method: 'DELETE',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({ id: currentOrder?.id })
-            // })
+            })
 
             if (!response.ok) {
                 throw new Error('Erro ao cancelar a ordem: ' + response.statusText)
@@ -188,15 +180,7 @@ export default function Order() {
                 URL: '/api/purchases',
                 method,
                 body: JSON.stringify(newOrder)
-            })  
-            
-            // const response = await fetch('/api/purchases', {
-            //     method: method,
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify(newOrder)
-            // })
+            })
 
             if (!response.ok) {
                 throw new Error('Erro ao salvar a ordem: ' + response.statusText);
@@ -224,14 +208,7 @@ export default function Order() {
                 const response = await FetchAPI({
                     URL: '/api/purchases?page=order',
                     method: 'GET'
-                })  
-
-                // const response = await fetch('/api/purchases?page=order', {
-                //     method: 'GET',
-                //     headers: {
-                //       'Content-Type': 'application/json'
-                //     },
-                // })
+                })
 
                 if (!response.ok) {
                     throw new Error('Erro ao buscar ordens: ' + response.statusText)

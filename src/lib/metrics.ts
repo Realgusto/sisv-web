@@ -24,14 +24,6 @@ export async function getMetrics(): Promise<MetricsType> {
         method: 'GET'
       })
 
-      // const response = await fetch(`${baseURL}/api/overview?id=${id}`, {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       'Authorization': '430ec2fc-5060-414b-aa41-7747d507e892',
-      //     },
-      // })
-
       if (!response.ok) {
           throw new Error('Erro ao buscar dados: ' + response.statusText)
       }
