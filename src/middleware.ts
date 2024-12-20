@@ -8,10 +8,6 @@ export default function middleware(request: NextRequest) {
     const token = request.cookies.get(TOKEN_KEY)
     const path = request.nextUrl.pathname
 
-    // if ((path.startsWith('/api')) && (!auth || auth !== process.env.API_SECRET_KEY)) {
-    //     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
-
     if (path === '/login' && token) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     } 
@@ -19,6 +15,10 @@ export default function middleware(request: NextRequest) {
     if (path !== '/login'  && !token) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
+
+    // if ((path.startsWith('/api')) && (!auth || auth !== process.env.API_SECRET_KEY)) {
+    //     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // }
 }
 
 export const config = {
