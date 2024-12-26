@@ -13,7 +13,7 @@ const MOCK_DATA = {
   })).reverse(),
 };
 
-export const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+export const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://sisv.vercel.app'
 
 export async function getMetrics(): Promise<MetricsType> {
   const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
