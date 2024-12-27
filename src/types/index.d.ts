@@ -17,6 +17,8 @@ interface MetricsType {
     }[];
     activeCustomers: number;
     inactiveCustomers: number;
+    expenses: number;
+    shopping: number;
 }
 
 interface bestSeller {

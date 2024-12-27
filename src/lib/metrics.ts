@@ -17,10 +17,28 @@ export async function getMetrics(): Promise<MetricsType> {
 
       const data: MetricsType = await response.json()
       
-      return data || {} as MetricsType;
+      return data || {
+        activeCustomers: 0,
+        salesMonthly: 0,
+        salesLastYear: [],
+        top5BestSeller: [],
+        averageTicket: 0,
+        inactiveCustomers: 0,
+        expenses: 0,
+        shopping: 0,
+      } as MetricsType;
   } catch (error) {
       console.error(error)
-      return {} as MetricsType;
+      return {
+        activeCustomers: 0,
+        salesMonthly: 0,
+        salesLastYear: [],
+        top5BestSeller: [],
+        averageTicket: 0,
+        inactiveCustomers: 0,
+        expenses: 0,
+        shopping: 0,
+      } as MetricsType;
   }
 }
 

@@ -18,7 +18,9 @@ export default async function Dashboard() {
     salesLastYear: [],
     top5BestSeller: [],
     averageTicket: 0,
-    inactiveCustomers: 0
+    inactiveCustomers: 0,
+    expenses: 0,
+    shopping: 0,
   } as MetricsType
   let crescimentoMensal = 0
   let sales: MonthlySales[] = []
