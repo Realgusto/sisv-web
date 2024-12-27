@@ -52,6 +52,8 @@ export async function POST(request: Request) {
                 top5BestSeller: JSON.parse(JSON.stringify(data.top5BestSeller)),
                 activeCustomers: data.activeCustomers,
                 inactiveCustomers: data.inactiveCustomers,
+                expenses: data.expenses,
+                shopping: data.shopping,
             },
         });
         return NextResponse.json(newOverview, { status: 201 });
@@ -77,6 +79,8 @@ export async function PUT(request: Request) {
                 top5BestSeller: JSON.parse(JSON.stringify(data.top5BestSeller)),
                 activeCustomers: data.activeCustomers,
                 inactiveCustomers: data.inactiveCustomers,
+                expenses: data.expenses,
+                shopping: data.shopping,
             },
         });
         return NextResponse.json(updatedOverview);
