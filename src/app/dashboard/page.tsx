@@ -33,7 +33,7 @@ export default async function Dashboard() {
   const pastValue = overview?.salesLastYear.find((value) => Number(value.mth) === pastMonth)?.tot_sales || 0
   const actualValue = overview?.salesMonthly || 0
 
-  crescimentoMensal = getCrescimentoMensal(actualValue, pastValue)
+  crescimentoMensal = await getCrescimentoMensal(actualValue, pastValue)
   
   const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
   sales = lastYear.map((sales) => {
