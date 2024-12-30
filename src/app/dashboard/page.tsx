@@ -1,4 +1,4 @@
-import { Package, DollarSign, Users, ShoppingCart, UserMinus, PieChart } from 'lucide-react'
+import { DollarSign, Users, ShoppingCart, UserMinus, Banknote } from 'lucide-react'
 
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,9 +25,6 @@ export default async function Dashboard() {
   let crescimentoMensal = 0
   let sales: MonthlySales[] = []
   let topFive: bestSeller[] = []
-  
-  const produtosEmEstoque = 0;
-  const lucratividade = 2;
 
   overview = await getMetrics()
   
@@ -95,13 +92,16 @@ export default async function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Produtos em Estoque</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Despesas</CardTitle>
+            <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(produtosEmEstoque)}</div>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(overview?.expenses)}</div>
             <CardDescription className="mt-2">
-              Métrica fictícia, apenas para exemplo
+              Total de despesas no mês, incluindo todas as despesas fixas e variáveis.
             </CardDescription>
           </CardContent>
         </Card>
@@ -159,13 +159,16 @@ export default async function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lucratividade</CardTitle>
-            <PieChart className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Compras</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{lucratividade}%</div>
+            <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(overview?.shopping)}</div>
             <CardDescription className="mt-2">
-              Métrica fictícia, apenas para exemplo
+              O total de compras realizadas no mês, reflete a quantidade total de transações de compra efetuadas durante o período de um mês.
             </CardDescription>
           </CardContent>
         </Card>
