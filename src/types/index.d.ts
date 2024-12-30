@@ -19,6 +19,8 @@ interface MetricsType {
     inactiveCustomers: number;
     expenses: number;
     shopping: number;
+    receipt: number;
+    payment: number;
 }
 
 interface bestSeller {

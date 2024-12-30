@@ -16,5 +16,5 @@ export default function Page() {
         }
     }, [user])
 
-    return <div className="flex h-screen w-screen items-center justify-center font-bold text-2xl">Redirecionando...</div>
+    return <div className="flex h-screen w-screen items-center justify-center font-bold text-2xl text-primary">Redirecionando...</div>
 }

@@ -37,15 +37,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-    
-    
-    const id = (new Date().getMonth() + 1).toString() + new Date().getFullYear().toString()
     const data: Overview = await request.json()
 
     try {
         const newOverview = await prisma.overview.create({
             data: {
-                id: id,
+                id: data.id,
                 salesMonthly: data.salesMonthly,
                 averageTicket: data.averageTicket,
                 salesLastYear: JSON.parse(JSON.stringify(data.salesLastYear)),
@@ -54,8 +51,10 @@ export async function POST(request: Request) {
                 inactiveCustomers: data.inactiveCustomers,
                 expenses: data.expenses,
                 shopping: data.shopping,
-            },
-        });
+                receipt: data.receipt, 
+                payment: data.payment,
+            }
+        })
         return NextResponse.json(newOverview, { status: 201 });
     } catch (error) {
         console.error('Erro ao criar métricas: '+ error);
@@ -81,6 +80,8 @@ export async function PUT(request: Request) {
                 inactiveCustomers: data.inactiveCustomers,
                 expenses: data.expenses,
                 shopping: data.shopping,
+                receipt: data.receipt, 
+                payment: data.payment,
             },
         });
         return NextResponse.json(updatedOverview);

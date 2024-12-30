@@ -26,6 +26,8 @@ export async function getMetrics(): Promise<MetricsType> {
         inactiveCustomers: 0,
         expenses: 0,
         shopping: 0,
+        receipt: 0,
+        payment: 0
       } as MetricsType;
   } catch (error) {
       console.error(error)
@@ -38,6 +40,8 @@ export async function getMetrics(): Promise<MetricsType> {
         inactiveCustomers: 0,
         expenses: 0,
         shopping: 0,
+        receipt: 0,
+        payment: 0
       } as MetricsType;
   }
 }

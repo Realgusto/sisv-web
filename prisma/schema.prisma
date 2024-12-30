@@ -55,4 +55,6 @@ model Overview {
   inactiveCustomers Int
   expenses          Float
   shopping          Float
+  receipt           Float @default(0)
+  payment           Float @default(0)
 }
