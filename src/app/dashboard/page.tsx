@@ -85,7 +85,7 @@ export default async function Dashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(overview?.activeCustomers || 0)}</div>
             <CardDescription className="mt-2">
-              Últimos 30 dias
+              Número de clientes ativos no mês.
             </CardDescription>
           </CardContent>
         </Card>
@@ -142,7 +142,7 @@ export default async function Dashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR').format(overview?.inactiveCustomers || 0)}</div>
             <CardDescription className="mt-2">
-              Últimos 30 dias
+              Número de clientes que não realizaram nenhuma compra no mês.
             </CardDescription>
           </CardContent>
         </Card>
