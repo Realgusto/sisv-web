@@ -3,8 +3,8 @@ import FetchAPI from '@/utils/fetch-api'
 export const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://sisv.vercel.app'
 
 export async function getMetrics(): Promise<MetricsType> {
-  const id = String(new Date().getMonth() + 1) + new Date().getFullYear().toString()
-
+  const id = (new Date().getMonth() + 1).toString().padStart(2, '0') + new Date().getFullYear().toString()
+  
   try {
       const response = await FetchAPI({
         URL: `${baseURL}/api/overview?id=${id}`,
