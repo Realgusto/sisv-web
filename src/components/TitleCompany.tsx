@@ -4,15 +4,9 @@ import { useUser } from "@/contexts/UserContext"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
 import { ArrowLeftRight } from "lucide-react"
-import { Tooltip } from "recharts"
-import { useTheme } from "next-themes"
-import { Card } from "./ui/card"
 
 export default function TitleCompany() {
     const { push } = useRouter()
-    const { theme, systemTheme } = useTheme()
-
-    const currentTheme = theme === 'system' ? systemTheme : theme
 
     const { companySelected } = useUser()
 

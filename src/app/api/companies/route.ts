@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { Company, PrismaClient, UserCompany } from '@prisma/client'
+import { Company, PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
