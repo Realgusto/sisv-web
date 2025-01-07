@@ -10,16 +10,17 @@ const prisma = new PrismaClient()
 export async function GET(request: Request) {
     const url = new URL(request.url)
     const id = url.searchParams.get('id')
+    const companyId = url.searchParams.get('companyId')
     
-    // Verifica se o ID é nulo ou indefinido
-    if (!id) {
-        return NextResponse.json({ error: 'ID não fornecido' }, { status: 400 });
+    if (!id || !companyId) {
+        return NextResponse.json({ error: 'ID ou ID da Empresa não fornecido' }, { status: 400 });
     }
 
     try {
         const overview: Overview | null = await prisma.overview.findUnique({
             where: {
-                id: id
+                id: id,
+                companyId: companyId
             }
         });
         
@@ -37,12 +38,23 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-    const data: Overview = await request.json()
+    const data: Overview & { cnpj: string } = await request.json()
 
     try {
+        const company = await prisma.company.findUnique({
+            where: {
+                cnpj: data.cnpj
+            }
+        })
+
+        if (!company) {
+            return NextResponse.json({ error: 'CNPJ não encontrado' }, { status: 404 });
+        }
+
         const newOverview = await prisma.overview.create({
             data: {
                 id: data.id,
+                companyId: company.id,
                 salesMonthly: data.salesMonthly,
                 averageTicket: data.averageTicket,
                 salesLastYear: JSON.parse(JSON.stringify(data.salesLastYear)),
@@ -65,12 +77,25 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-    const data: Overview = await request.json();
+    const data: Overview & { cnpj: string } = await request.json();
     const { id } = data;
 
     try {
+        const company = await prisma.company.findUnique({
+            where: {
+                cnpj: data.cnpj
+            }
+        })
+
+        if (!company) {
+            return NextResponse.json({ error: 'CNPJ não encontrado' }, { status: 404 });
+        }
+
         const updatedOverview = await prisma.overview.update({
-            where: { id: id },
+            where: {
+                id: id,
+                companyId: company.id
+            },
             data: {
                 salesMonthly: data.salesMonthly,
                 averageTicket: data.averageTicket,
@@ -94,11 +119,21 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-    const { id }: Overview = await request.json();
+    const { id, cnpj }: Overview & { cnpj: string } = await request.json();
     try {
-        // Verifica se o registro existe
+        const company = await prisma.company.findUnique({
+            where: { cnpj }
+        })
+
+        if (!company) {
+            return NextResponse.json({ error: 'CNPJ não encontrado' }, { status: 404 });
+        }
+
         const overview = await prisma.overview.findUnique({
-            where: { id: id },
+            where: {
+                id: id,
+                companyId: company.id
+            },
         });
 
         if (!overview) {
@@ -106,7 +141,10 @@ export async function DELETE(request: Request) {
         }
 
         await prisma.overview.delete({
-            where: { id: id },
+            where: {
+                id: id,
+                companyId: company.id
+            },
         });
         return NextResponse.json({ id: id, message: 'Métricas deletadas com sucesso' });
     } catch (error) {

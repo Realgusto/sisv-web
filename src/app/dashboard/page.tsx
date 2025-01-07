@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { getMetrics, getCrescimentoMensal } from '@/lib/metrics'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import TitleCompany from '@/components/TitleCompany'
 
 export default async function Dashboard() {
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
@@ -30,12 +31,12 @@ export default async function Dashboard() {
 
   overview = await getMetrics()
   
-  const pastMonth = new Date().getMonth()
+  const pastMonth = new Date().getMonth() === 0 ? 12 : new Date().getMonth()
   const pastValue = overview?.salesLastYear.find((value) => Number(value.mth) === pastMonth)?.tot_sales || 0
   const actualValue = overview?.salesMonthly || 0
 
   crescimentoMensal = await getCrescimentoMensal(actualValue, pastValue)
-  
+
   const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
   sales = lastYear.map((sales) => {
     return {
@@ -56,7 +57,8 @@ export default async function Dashboard() {
   }) || []
   
   return (
-    <div className="p-6 space-y-6 w-full max-w-full overflow-x-hidden">
+    <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
+      <TitleCompany />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -2,13 +2,17 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import Cookies from 'js-cookie'
-import { TOKEN_KEY } from '@/constants'
+import { TOKEN_KEY, URL_ENTRY } from '@/constants'
 import { useRouter } from 'next/navigation'
-import { User } from '@prisma/client'
+import { Company, User } from '@prisma/client'
+import FetchAPI from '@/utils/fetch-api'
 
 interface UserContextType {
   user: User | null
-  login: (userData: User) => void
+  companySelected: Company | null
+  selectCompany: (company: Company) => void
+  companies: Company[] | null
+  login: (userData: User, companiesData: Company[]) => void
   logout: () => void
 }
 
@@ -18,6 +22,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { push } = useRouter()
 
   const [user, setUser] = useState<User | null>(null);
+  const [companies, setCompanies] = useState<Company[] | null>(null);
+  const [companySelected, setCompanySelected] = useState<Company | null>(null);
 
   useEffect(() => {
     (async() => {
@@ -25,22 +31,27 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const id = Cookies.get(TOKEN_KEY)
               
         if (id) {
-          const res = await fetch('/api/users?id='+id, {
+          const res = await FetchAPI({
+              URL: '/api/users?id='+id,
               method: 'GET',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': '430ec2fc-5060-414b-aa41-7747d507e892',
-              }
           })
           const user: User | null = res.ok ? await res.json() : null
 
           if (user) {
-            if (user.admin) {
-              push('/dashboard')
+            const response = await FetchAPI({ 
+              URL: '/api/companies?userId='+id,
+              method: 'GET'
+            })
+      
+            const companies: Company[] | null = response.ok ? await response.json() : null
+            
+            if (companies) {
+              setUser(user)
+              setCompanies(companies)
+              push(URL_ENTRY)
             } else {
-              push('/shortcuts')
+              push('/login')
             }
-            setUser(user)
           }
         } else {
           push('/login')
@@ -51,16 +62,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     })()
   }, [push])
 
-  const login = (userData: User) => {
+  const selectCompany = (company: Company) => {
+    setCompanySelected(company)
+  }
+
+  const login = (userData: User, companiesData: Company[]) => {
     const ret = Cookies.set(TOKEN_KEY, userData.id, { expires: 1 })
     if (ret !== '') {
-      if (userData.admin) {
-        push('/dashboard')
-      } else {
-        push('/shortcuts')
-      }
+      push(URL_ENTRY)
     }
     setUser(userData)
+    setCompanies(companiesData)
   };
 
   const logout = () => {
@@ -70,7 +82,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{
+      user,
+      companySelected,
+      selectCompany,
+      companies,
+      login,
+      logout
+    }}>
       {children}
     </UserContext.Provider>
   );

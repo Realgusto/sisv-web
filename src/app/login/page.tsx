@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { User, Lock } from 'lucide-react'
 import { useUser } from '@/contexts/UserContext'
-import { User as UserType } from '@prisma/client'
+import { Company, User as UserType } from '@prisma/client'
 import FourEasyIcon from '@/components/FourEasyIcon'
 import md5 from 'md5'
 import FetchAPI from '@/utils/fetch-api'
@@ -34,7 +34,18 @@ export default function LoginPage() {
 
       const userData: UserType | null = response.ok ? await response.json() : null
       if (userData) {
-        login(userData)
+        const companies = await FetchAPI({ 
+          URL: '/api/companies?userId=' + userData.id,
+          method: 'GET'
+        })
+  
+        const companiesData: Company[] | null = companies.ok ? await companies.json() : null
+        
+        if (companiesData) {
+          login(userData, companiesData)
+        } else {
+          setError('Erro ao buscar empresas')
+        }
       } else {
         setError('Usuário ou senha inválidos')
       }

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -9,19 +10,24 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  name      String
-  email     String     @unique
-  password  String
-  admin     Boolean    @default(false)
-  purchases Purchase[] @relation("UserPurchases")
+  id          String        @id @default(cuid())
+  name        String
+  email       String        @unique
+  password    String
+  admin       Boolean       @default(false)
+  active      Boolean       @default(true)
+  updated_at  DateTime      @default(now())
+  purchases   Purchase[]    @relation("UserPurchases")
+  UserCompany UserCompany[]
+  Company     Company[]     @relation("UserCompanies")
 }
 
 model Purchase {
   id            String    @id @default(cuid())
+  companyId     String
+  company       Company   @relation("Company", fields: [companyId], references: [id])
   date          DateTime
   delivery_date DateTime
-  user_id       String
   supplier      String?
   product       String
   quantity      Int
@@ -29,8 +35,52 @@ model Purchase {
   department    String?
   observations  String?
   status        Status?
-  user          User      @relation(fields: [user_id], references: [id], name: "UserPurchases")
+  user_id       String
   updated_at    DateTime? @default(now()) @updatedAt
+  user          User      @relation("UserPurchases", fields: [user_id], references: [id])
+}
+
+model Overview {
+  id                String  @id
+  companyId         String
+  company           Company @relation("Company", fields: [companyId], references: [id])
+  salesMonthly      Float
+  averageTicket     Float
+  salesLastYear     Json[]
+  top5BestSeller    Json[]
+  activeCustomers   Int
+  inactiveCustomers Int
+  expenses          Float
+  shopping          Float
+  payment           Float   @default(0)
+  receipt           Float   @default(0)
+}
+
+model Company {
+  id          String        @id
+  cnpj        String        @unique
+  name        String
+  fantasy     String
+  address     String
+  city        String
+  state       String
+  phone       String
+  email       String
+  active      Boolean       @default(true)
+  updated_at  DateTime      @default(now())
+  UserCompany UserCompany[]
+  User        User[]        @relation("UserCompanies")
+  Overview    Overview[]    @relation("Company")
+  Purchase    Purchase[]    @relation("Company")
+}
+
+model UserCompany {
+  userId    String
+  companyId String
+  Company   Company @relation(fields: [companyId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+
+  @@id([userId, companyId])
 }
 
 enum Status {
@@ -43,18 +93,4 @@ enum Status {
   Pedido_aprovado
   Pedido_rejeitado
   Pedido_encerrado
-}
-
-model Overview {
-  id                String @id
-  salesMonthly      Float
-  averageTicket     Float
-  salesLastYear     Json[]
-  top5BestSeller    Json[]
-  activeCustomers   Int
-  inactiveCustomers Int
-  expenses          Float
-  shopping          Float
-  receipt           Float @default(0)
-  payment           Float @default(0)
 }
