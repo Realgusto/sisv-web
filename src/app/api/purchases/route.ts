@@ -10,7 +10,12 @@ const prisma = new PrismaClient()
 
 export async function GET(request: Request) {
     const url = new URL(request.url)
+    const companyId = url.searchParams.get('companyId')
     const page = url.searchParams.get('page')
+
+    if (!companyId) {
+        return NextResponse.json({ error: 'ID da Empresa não fornecido' }, { status: 400 });
+    }
 
     let purchases: Purchase[]
 
@@ -18,17 +23,23 @@ export async function GET(request: Request) {
         if (page === 'order') {
             purchases = await prisma.purchase.findMany({
                 where: {
+                    companyId: companyId,
                     status: { notIn: [ Status.Aberta, Status.Cancelada ]}
                 }
             })
         } else if (page === 'budget') {
             purchases = await prisma.purchase.findMany({
                 where: {
+                    companyId: companyId,
                     status: Status.Aberta
                 }
             })
         } else {
-            purchases = await prisma.purchase.findMany()
+            purchases = await prisma.purchase.findMany({
+                where: {
+                    companyId: companyId
+                }
+            })
         }
         
         if (!purchases) {
@@ -50,6 +61,7 @@ export async function POST(request: Request) {
         const newPurchase = await prisma.purchase.create({
             data: {
                 date: new Date(),
+                companyId: data.companyId,
                 user_id: data.user_id,
                 supplier: data.supplier,
                 product: data.product,
@@ -72,10 +84,22 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
     const data: Purchase = await request.json();
-    const { id } = data;
+    const { id, companyId } = data;
+
+    if (!id) {
+        return NextResponse.json({ error: 'ID da Ordem não fornecido' }, { status: 400 });
+    }
+
+    if (!companyId) {
+        return NextResponse.json({ error: 'ID da Empresa não fornecido' }, { status: 400 });
+    }
+
     try {
         const updatedPurchase = await prisma.purchase.update({
-            where: { id: id },
+            where: {
+                id: id,
+                companyId: companyId
+            },
             data: {
                 supplier: data.supplier,
                 product: data.product,
@@ -97,10 +121,13 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-    const { id }: Purchase = await request.json();
+    const { id, companyId }: Purchase = await request.json();
     try {
         await prisma.purchase.update({
-            where: { id: id },
+            where: {
+                id: id,
+                companyId: companyId
+            },
             data: {
                 status: Status.Cancelada
             }
