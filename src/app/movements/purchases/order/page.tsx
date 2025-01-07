@@ -55,7 +55,7 @@ import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
 
 export default function Order() {
-    const { user } = useUser();
+    const { user, companySelected } = useUser();
     
     const [orders, setOrders] = useState<Purchase[]>([])
     const [isDialogOpen, setDialogOpen] = useState(false)
@@ -70,6 +70,7 @@ export default function Order() {
     const handleOpenDialog = (order: Purchase | null = null) => {
         setCurrentOrder(order || {
             id: '',
+            companyId: '',
             date: new Date(),
             delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
             user_id: user ? user.id : '',
@@ -88,6 +89,7 @@ export default function Order() {
     const handleCloseDialog = () => {
         setCurrentOrder({
             id: '',
+            companyId: '',
             date: new Date(),
             delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
             user_id: user ? user.id : '',
@@ -160,6 +162,7 @@ export default function Order() {
 
         const newOrder: Purchase = {
             id: currentOrder.id !== '' ? currentOrder.id : uuidv4(),
+            companyId: companySelected ? companySelected.id : '',
             date: currentOrder.id !== '' ? currentOrder.date : new Date(),
             user_id: user ? user.id : '',
             supplier: currentOrder.supplier,
