@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: false,
   },
-  source: '/api/:path*',
   headers: async () => [
     {
         source: '/api/:path*',
