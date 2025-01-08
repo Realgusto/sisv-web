@@ -13,8 +13,10 @@ export async function GET(request: Request) {
     const companyId = url.searchParams.get('companyId')
     
     if (!id || !companyId) {
-        return NextResponse.json({ error: 'ID ou ID da Empresa não fornecido' }, { status: 400 });
+        return NextResponse.json({ error: 'ID da métrica ou ID da Empresa não fornecido' }, { status: 400 });
     }
+
+    console.log('Consultando Overview com id:', id, 'e companyId:', companyId);
 
     try {
         const overview: Overview | null = await prisma.overview.findUnique({

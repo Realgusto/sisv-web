@@ -3,9 +3,13 @@ import FetchAPI from '@/utils/fetch-api'
 export const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://sisv.vercel.app'
 
 export async function getMetrics(companyId: string): Promise<MetricsType> {
+  if (companyId === '') {
+    throw new Error('ID da empresa não informado')
+  }
+  
   const id = (new Date().getMonth() + 1).toString().padStart(2, '0') + new Date().getFullYear().toString()
   
-
+  console.log(`Consultando em: ${baseURL}/api/overview?id=${id}&companyId=${companyId}`)
   try {
       const response = await FetchAPI({
         URL: `${baseURL}/api/overview?id=${id}&companyId=${companyId}`,
