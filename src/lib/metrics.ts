@@ -9,7 +9,6 @@ export async function getMetrics(companyId: string): Promise<MetricsType> {
   
   const id = (new Date().getMonth() + 1).toString().padStart(2, '0') + new Date().getFullYear().toString()
   
-  console.log(`Consultando em: ${baseURL}/api/overview?id=${id}&companyId=${companyId}`)
   try {
       const response = await FetchAPI({
         URL: `${baseURL}/api/overview?id=${id}&companyId=${companyId}`,

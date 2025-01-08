@@ -33,18 +33,18 @@ export default function Dashboard() {
         return
       }
       
-      console.log(companySelected)
       const metrics = await getMetrics(companySelected.id)
       setOverview(metrics)
-      
+
       const pastMonth = new Date().getMonth() === 0 ? 12 : new Date().getMonth()
-      const pastValue = metrics?.salesLastYear.find((value) => Number(value.mth) === pastMonth)?.tot_sales || 0
-      const actualValue = metrics?.salesMonthly || 0
+      const pastSales = metrics.salesLastYear.find((value) => Number(value.mth) === pastMonth)
+      const pastValue = pastSales ? pastSales.tot_sales : 0
+      const actualValue = metrics.salesMonthly || 0
 
       const crescimento = await getCrescimentoMensal(actualValue, pastValue)
       setCrescimentoMensal(crescimento)
 
-      const lastYear: { mth: number, tot_sales: number }[]  = JSON.parse(JSON.stringify(overview?.salesLastYear))
+      const lastYear: { mth: number, tot_sales: number }[] = metrics.salesLastYear ? JSON.parse(JSON.stringify(metrics.salesLastYear)) : [];
       setSales(lastYear.map((sales) => {
         return {
           mes: format(new Date(new Date().getFullYear(), sales.mth - 1), 'MMMM', { locale: ptBR }),
@@ -52,7 +52,7 @@ export default function Dashboard() {
         } 
       }))
 
-      const top5: { product: string, un: string, amount: number }[] = JSON.parse(JSON.stringify(overview?.top5BestSeller))
+      const top5: { product: string, un: string, amount: number }[] = metrics.top5BestSeller ? JSON.parse(JSON.stringify(metrics.top5BestSeller)) : [];
 
       setTopFive(top5.map((product, index) => {
         return {
