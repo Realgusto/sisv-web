@@ -32,7 +32,9 @@ export default function Dashboard() {
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
   useEffect(() => {
-    setIsClient(true);
+    if (!isClient) {
+      setIsClient(true)
+    }
   }, []);
 
   useEffect(() => {
