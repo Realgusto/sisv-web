@@ -54,10 +54,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
 // import CalendarDatePicker from '@/components/CalendarDatePicker'
-import NotFound from '@/assets/NotFound.json'
-import dynamic from 'next/dynamic'
-
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
+import NotFound from '@/components/NotFound'
 
 export default function Order() {
     const { user, companySelected } = useUser();
@@ -265,19 +262,7 @@ export default function Order() {
                 </Button>
             </div>
             {   orders.length === 0 && !isLoading ? 
-                <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
-                    <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
-                        <Lottie
-                            animationData={NotFound}
-                            loop={true}
-                            autoplay={true}
-                            className="w-72"
-                        />
-                        <h1 className="text-lg font-bold text-center text-wrap">
-                            Nenhuma ordem encontrada. Para iniciar, clique no botão Ordem acima, e crie uma nova ordem.
-                        </h1>
-                    </div>
-                </div>
+                <NotFound title='Nenhuma ordem encontrada. Para iniciar, clique no botão "Ordem" acima, e crie uma nova ordem.' />
             :
                 <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
                     <TableCaption className="select-none">Uma lista das suas ordens de compra.</TableCaption>

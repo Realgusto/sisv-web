@@ -53,10 +53,7 @@ import { Purchase, Status } from '@prisma/client'
 import { Combobox } from '@/components/ui/combobox'
 import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
-import NotFound from '@/assets/NotFound.json'
-import dynamic from 'next/dynamic'
-
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
+import NotFound from '@/components/NotFound'
 
 export default function Budget() {
     const { user, companySelected } = useUser()
@@ -290,19 +287,7 @@ export default function Budget() {
                 </Button>
             </div>
             {   orders.length === 0 && !isLoading ?
-                    <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
-                        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
-                            <Lottie
-                                animationData={NotFound}
-                                loop={true}
-                                autoplay={true}
-                                className="w-72"
-                            />
-                            <h1 className="text-lg font-bold text-center text-wrap">
-                                Nenhum orçamento encontrado. Para iniciar, clique no botão Orçamento acima, e crie um novo orçamento.
-                            </h1>
-                        </div>
-                    </div>
+                    <NotFound title='Nenhum orçamento encontrado. Para iniciar, clique no botão "Orçamento" acima, e crie um novo orçamento.' />
                 :
                     <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
                         <TableCaption className="select-none">Uma lista dos seus orçamentos.</TableCaption>

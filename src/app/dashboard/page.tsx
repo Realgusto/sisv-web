@@ -15,19 +15,16 @@ import { useRouter } from 'next/navigation'
 import Loader from '@/components/ui/loader'
 import FetchAPI from '@/utils/fetch-api'
 import { toast } from 'sonner'
-import NotFound from '@/assets/NotFound.json'
-import dynamic from 'next/dynamic'
-
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
+import NotFound from '@/components/NotFound'
 
 export default function Dashboard() {
   const { push } = useRouter()
   const { companySelected } = useUser()
 
-  const [overview, setOverview] = useState<MetricsType | null>(null);
-  const [crescimentoMensal, setCrescimentoMensal] = useState(0);
-  const [sales, setSales] = useState<MonthlySales[]>([]);
-  const [topFive, setTopFive] = useState<bestSeller[]>([]);
+  const [overview, setOverview] = useState<MetricsType | null>(null)
+  const [crescimentoMensal, setCrescimentoMensal] = useState(0)
+  const [sales, setSales] = useState<MonthlySales[]>([])
+  const [topFive, setTopFive] = useState<bestSeller[]>([])
 
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
@@ -108,17 +105,7 @@ export default function Dashboard() {
     <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
       <TitleCompany />
       { overview.activeCustomers === 0 && overview.salesMonthly === 0 && overview.salesLastYear.length === 0 && overview.top5BestSeller.length === 0 && overview.averageTicket === 0 && overview.inactiveCustomers === 0 && overview.expenses === 0 && overview.shopping === 0 && overview.receipt === 0 && overview.payment === 0 ?
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
-          <Lottie
-            animationData={NotFound}
-            loop={true}
-            autoplay={true}
-            className="w-72"
-          />
-          <h1 className="text-lg font-bold text-center text-wrap">
-            Nenhuma métrica encontrada para a empresa selecionada, por favor, selecione outra empresa ou tente novamente.
-          </h1>
-        </div>
+        <NotFound title='Nenhuma métrica encontrada para a empresa selecionada, por favor, selecione outra empresa ou tente novamente.' />
       :
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
