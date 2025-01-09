@@ -297,7 +297,7 @@ export default function Budget() {
                                 className="w-72"
                             />
                             <h1 className="text-lg font-bold text-center text-wrap">
-                                Nenhum orçamento encontrado. Para iniciar, clique no botão &quot;Orçamento&quot; acima, e crie um novo orçamento.
+                                Nenhum orçamento encontrado. Para iniciar, clique no botão Orçamento acima, e crie um novo orçamento.
                             </h1>
                         </div>
                     </div>

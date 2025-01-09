@@ -272,7 +272,7 @@ export default function Order() {
                             className="w-72"
                         />
                         <h1 className="text-lg font-bold text-center text-wrap">
-                            Nenhuma ordem encontrada. Para iniciar, clique no botão &quot;Ordem&quot; acima, e crie uma nova ordem.
+                            Nenhuma ordem encontrada. Para iniciar, clique no botão Ordem acima, e crie uma nova ordem.
                         </h1>
                     </div>
                 </div>
