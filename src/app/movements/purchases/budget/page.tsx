@@ -53,6 +53,8 @@ import { Purchase, Status } from '@prisma/client'
 import { Combobox } from '@/components/ui/combobox'
 import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
+import Lottie from 'lottie-react'
+import NotFound from '@/assets/NotFound.json'
 
 export default function Budget() {
     const { user, companySelected } = useUser()
@@ -141,7 +143,10 @@ export default function Budget() {
             const response = await FetchAPI({
                 URL: '/api/purchases',
                 method: 'DELETE',
-                body: JSON.stringify({ id: currentOrder?.id })
+                body: JSON.stringify({
+                    id: currentOrder?.id,
+                    companyId: companySelected ? companySelected.id : ''
+                })
             })
 
             if (!response.ok) {
@@ -247,16 +252,19 @@ export default function Budget() {
             setIsLoading(true)
             try {
                 const response = await FetchAPI({
-                    URL: '/api/purchases?page=budget',
+                    URL: '/api/purchases?page=budget&companyId=' + companySelected?.id,
                     method: 'GET'
                 })
 
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar ordens: ' + response.statusText)
+                if ((response.status !== 200) && (response.status !== 404)) {
+                    throw new Error('Erro ao buscar orçamentos: ' + response.statusText)
+                } else if (response.status === 404) {
+                    toast.error('Nenhum orçamento encontrado')
+                    setOrders([])
+                } else {
+                    const data = await response.json()
+                    setOrders(data)
                 }
-
-                const data = await response.json()
-                setOrders(data)
             } catch (error) {
                 console.error(error)
             } finally {
@@ -279,136 +287,152 @@ export default function Budget() {
                     <span className="hidden sm:block ml-2">Orçamento</span>
                 </Button>
             </div>
-            <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
-                <TableCaption className="select-none">{orders.length > 0 || isLoading ? 'Uma lista dos seus orçamentos.' : 'Nenhum registro por aqui...'}</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>
-                        <TableHead className="w-[100px] sm:w-[120px] select-none">Data</TableHead>
-                        <TableHead className="w-[100px] sm:w-[120px] select-none">Setor</TableHead>
-                        <TableHead className="select-none">Produto</TableHead>
-                        <TableHead className="w-[80px] sm:w-[150px] select-none">Quant.</TableHead>
-                        <TableHead className="w-[80px] sm:w-[150px] text-right select-none">Valor</TableHead>
-                        <TableHead className="w-[35px] sm:w-[50px] text-right select-none">Ações</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {   isLoading ? 
-                        <TableRow className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
-                            <TableCell hidden className="h-[120px] sm:h-[80px]">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                            <TableCell className="w-[100px] sm:w-[120px]">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                            <TableCell className="w-[100px] sm:w-[120px]">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                            <TableCell className="select-none">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                            <TableCell className="w-[80px] sm:w-[150px]">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                            <TableCell className="w-[80px] sm:w-[150px]">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                            <TableCell className="w-[35px] sm:w-[50px]">
-                                <Skeleton className="h-10 w-full rounded-lg" />
-                            </TableCell>
-                        </TableRow>
-                     :
-                        orders.map(order => (
-                            <TableRow 
-                                key={order.id} 
-                                onDoubleClick={() => handleItemDoubleClick(order)} 
-                                className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800"
-                            >
-                                <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
-                                <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
-                                <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{order.department ? order.department : 'N . D'}</TableCell>
-                                <TableCell className="select-none text-xs sm:text-base">{order.product}</TableCell>
-                                <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{Number(order.quantity).toLocaleString('pt-BR')} UN</TableCell>
-                                <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">
+            {   orders.length === 0 && !isLoading ?
+                    <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
+                        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
+                            <Lottie
+                                animationData={NotFound}
+                                loop={true}
+                                autoplay={true}
+                                className="w-72"
+                            />
+                            <h1 className="text-lg font-bold text-center text-wrap">
+                                Nenhum orçamento encontrado. Para iniciar, clique no botão "Orçamento" acima, e crie um novo orçamento.
+                            </h1>
+                        </div>
+                    </div>
+                :
+                    <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
+                        <TableCaption className="select-none">Uma lista dos seus orçamentos.</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>
+                                <TableHead className="w-[100px] sm:w-[120px] select-none">Data</TableHead>
+                                <TableHead className="w-[100px] sm:w-[120px] select-none">Setor</TableHead>
+                                <TableHead className="select-none">Produto</TableHead>
+                                <TableHead className="w-[80px] sm:w-[150px] select-none">Quant.</TableHead>
+                                <TableHead className="w-[80px] sm:w-[150px] text-right select-none">Valor</TableHead>
+                                <TableHead className="w-[35px] sm:w-[50px] text-right select-none">Ações</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {   isLoading ? 
+                                <TableRow className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
+                                    <TableCell hidden className="h-[120px] sm:h-[80px]">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                    <TableCell className="w-[100px] sm:w-[120px]">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                    <TableCell className="w-[100px] sm:w-[120px]">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                    <TableCell className="select-none">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                    <TableCell className="w-[80px] sm:w-[150px]">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                    <TableCell className="w-[80px] sm:w-[150px]">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                    <TableCell className="w-[35px] sm:w-[50px]">
+                                        <Skeleton className="h-10 w-full rounded-lg" />
+                                    </TableCell>
+                                </TableRow>
+                            :
+                                orders.map(order => (
+                                    <TableRow 
+                                        key={order.id} 
+                                        onDoubleClick={() => handleItemDoubleClick(order)} 
+                                        className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800"
+                                    >
+                                        <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
+                                        <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
+                                        <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{order.department ? order.department : 'N . D'}</TableCell>
+                                        <TableCell className="select-none text-xs sm:text-base">{order.product}</TableCell>
+                                        <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{Number(order.quantity).toLocaleString('pt-BR')} UN</TableCell>
+                                        <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">
+                                            {Intl.NumberFormat('pt-BR', {
+                                                style: 'currency',
+                                                currency: 'BRL',
+                                            }).format(order.value || 0)}
+                                        </TableCell>
+                                        <TableCell className="w-[35px] sm:w-[50px] text-right select-none">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button 
+                                                        variant={"secondary"}
+                                                        size={"icon"}
+                                                    >
+                                                        <MoreVertical className="h-3 w-3" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuItem onClick={() => {
+                                                        toast.info('Preencha o fornecedor e o valor para criar uma ordem de compra a partir do orçamento.')
+
+                                                        handleOpenDialog(order)
+                                                        setPropsDialog(true)
+                                                    }}>
+                                                        <ClipboardPenLine className="h-3 w-3 mr-2" /> Gerar Ordem
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleOpenDialog(order)}>
+                                                        <Edit className="h-3 w-3 mr-2" /> Editar
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-red-400 hover:text-red-500" onClick={() => handleOpenAlertDialog(order)}>
+                                                        <PackageX className="h-3 w-3 mr-2" /> Cancelar
+                                                    </DropdownMenuItem>                                            
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Deseja cancelar o orçamento?
+                                                            { currentOrder?.product && <><br />Produto: {currentOrder.product}</> }
+                                                            { currentOrder?.department && <><br />Setor: {currentOrder.department}</> }
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel onClick={() => setIsAlertDialogOpen(false)}>
+                                                            <X className="h-3 w-3" />
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            className={`bg-red-500 text-white hover:bg-red-600 ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                            onClick={() => handleDeleteOrder()}
+                                                            disabled={isDeleting}
+                                                        >
+                                                            {isDeleting ? 'Cancelando...' : <><PackageX className="h-3 w-3 mr-2" /> Cancelar</>}
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={4} className="select-none text-base font-bold">Total</TableCell>
+                                <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-base font-bold">
                                     {Intl.NumberFormat('pt-BR', {
                                         style: 'currency',
                                         currency: 'BRL',
-                                    }).format(order.value || 0)}
+                                    }).format(orders.reduce((total, order) => {
+                                        if (order.status === Status.Faturada || order.status?.startsWith('Pedido')) {
+                                            return total + (order.quantity * (order.value || 0))
+                                        }
+                                        return total
+                                    }, 0))}
                                 </TableCell>
-                                <TableCell className="w-[35px] sm:w-[50px] text-right select-none">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button 
-                                                variant={"secondary"}
-                                                size={"icon"}
-                                            >
-                                                <MoreVertical className="h-3 w-3" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem onClick={() => {
-                                                toast.info('Preencha o fornecedor e o valor para criar uma ordem de compra a partir do orçamento.')
-
-                                                handleOpenDialog(order)
-                                                setPropsDialog(true)
-                                            }}>
-                                                <ClipboardPenLine className="h-3 w-3 mr-2" /> Gerar Ordem
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleOpenDialog(order)}>
-                                                <Edit className="h-3 w-3 mr-2" /> Editar
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-400 hover:text-red-500" onClick={() => handleOpenAlertDialog(order)}>
-                                                <PackageX className="h-3 w-3 mr-2" /> Cancelar
-                                            </DropdownMenuItem>                                            
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                    <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Deseja cancelar o orçamento?
-                                                    { currentOrder?.product && <><br />Produto: {currentOrder.product}</> }
-                                                    { currentOrder?.department && <><br />Setor: {currentOrder.department}</> }
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel onClick={() => setIsAlertDialogOpen(false)}>
-                                                    <X className="h-3 w-3" />
-                                                </AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    className={`bg-red-500 text-white hover:bg-red-600 ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                    onClick={() => handleDeleteOrder()}
-                                                    disabled={isDeleting}
-                                                >
-                                                    {isDeleting ? 'Cancelando...' : <><PackageX className="h-3 w-3 mr-2" /> Cancelar</>}
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </TableCell>
+                                <TableCell className="w-[35px] sm:w-[50px] text-right select-none" />
                             </TableRow>
-                        ))
-                    }
-                </TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TableCell colSpan={4} className="select-none text-base font-bold">Total</TableCell>
-                        <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-base font-bold">
-                            {Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                            }).format(orders.reduce((total, order) => {
-                                if (order.status === Status.Faturada || order.status?.startsWith('Pedido')) {
-                                    return total + (order.quantity * (order.value || 0))
-                                }
-                                return total
-                            }, 0))}
-                        </TableCell>
-                        <TableCell className="w-[35px] sm:w-[50px] text-right select-none" />
-                    </TableRow>
-                </TableFooter>
-            </Table>
+                        </TableFooter>
+                    </Table>
+            }
 
             <div className="flex justify-center items-center rounded-lg">
                 <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>

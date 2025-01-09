@@ -46,10 +46,10 @@ export async function GET(request: Request) {
             NextResponse.json({ error: 'Nenhuma ordem encontrada' }, { status: 404 });
         }
 
-        return NextResponse.json(purchases, { status: 200 });
+        return NextResponse.json(purchases, { status: 200 })
     } catch (error) {
-        console.error('Erro ao buscar ordens: '+ error);
-        return NextResponse.json({ error: 'Erro ao buscar ordens: ' + error }, { status: 500 });
+        console.error('Erro ao buscar ordens: '+ error)
+        return NextResponse.json({ error: 'Erro ao buscar ordens: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect();
     }
@@ -72,11 +72,11 @@ export async function POST(request: Request) {
                 department: data.department,
                 observations: data.observations
             },
-        });
-        return NextResponse.json(newPurchase, { status: 201 });
+        })
+        return NextResponse.json(newPurchase, { status: 201 })
     } catch (error) {
-        console.error('Erro ao criar ordem: '+ error);
-        return NextResponse.json({ error: 'Erro ao criar ordem: ' + error }, { status: 500 });
+        console.error('Erro ao criar ordem: '+ error)
+        return NextResponse.json({ error: 'Erro ao criar ordem: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect();
     }
