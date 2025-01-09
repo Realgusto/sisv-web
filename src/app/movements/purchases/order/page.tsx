@@ -54,8 +54,10 @@ import { Combobox } from '@/components/ui/combobox'
 import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
 // import CalendarDatePicker from '@/components/CalendarDatePicker'
-import Lottie from 'lottie-react'
 import NotFound from '@/assets/NotFound.json'
+import dynamic from 'next/dynamic'
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
 
 export default function Order() {
     const { user, companySelected } = useUser();

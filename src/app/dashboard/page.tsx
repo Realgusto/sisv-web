@@ -16,7 +16,7 @@ import Loader from '@/components/ui/loader'
 import FetchAPI from '@/utils/fetch-api'
 import { toast } from 'sonner'
 import NotFound from '@/assets/NotFound.json'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
 
