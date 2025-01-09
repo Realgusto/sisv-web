@@ -7,7 +7,6 @@ import { ArrowLeftRight } from "lucide-react"
 
 export default function TitleCompany() {
     const { push } = useRouter()
-
     const { companySelected } = useUser()
 
     // const [ date, setDate ] = useState<Date>(new Date())
