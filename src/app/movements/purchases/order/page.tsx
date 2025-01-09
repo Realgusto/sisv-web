@@ -241,7 +241,7 @@ export default function Order() {
         }
 
         fetchOrders()
-    }, []);
+    }, [companySelected?.id])
 
     return (
         <div className="p-4 sm:p-6 bg-background min-h-screen h-full">
