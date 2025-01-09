@@ -27,9 +27,14 @@ export default function Dashboard() {
   const [crescimentoMensal, setCrescimentoMensal] = useState(0);
   const [sales, setSales] = useState<MonthlySales[]>([]);
   const [topFive, setTopFive] = useState<bestSeller[]>([]);
+  const [isClient, setIsClient] = useState(false);
 
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!companySelected || companySelected.id === '') {
