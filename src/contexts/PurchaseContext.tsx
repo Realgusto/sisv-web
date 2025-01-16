@@ -53,7 +53,7 @@ export const PurchaseProvider = ({ children }: { children: ReactNode }) => {
 
       setIsLoading(false)
     })()
-  }, [currentPurchase.id])
+  }, [currentPurchase.id, currentPurchase])
 
   const clearPurchase = () => {
     setCurrentPurchase({
