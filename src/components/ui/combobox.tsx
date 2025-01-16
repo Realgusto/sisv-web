@@ -19,41 +19,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-const departments = [
-  {
-    value: "Tecnologia",
-    label: "Tecnologia",
-  },
-  {
-    value: "Administração",
-    label: "Administração",
-  },
-  {
-    value: "Financeiro",
-    label: "Financeiro",
-  },
-  {
-    value: "Vendas",
-    label: "Vendas",
-  },
-  {
-    value: "Compras",
-    label: "Compras",
-  },
-  {
-    value: "Estoque",
-    label: "Estoque",
-  }
-]
-
 type ComboboxProps = {
+  defaultTitle?: string
+  defaultComandPlaceHolder?: string
+  defaultComandEmpty?: string
+  items?: { value: string; label: string }[]
   value?: string
   className?: string
   disabled?: boolean
   onChange?: (value: string) => void
 }
 
-export function Combobox({ value: initialValue, className, disabled, onChange }: ComboboxProps) {
+export function Combobox({ defaultTitle, defaultComandPlaceHolder, defaultComandEmpty, items, value: initialValue, className, disabled, onChange }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState(initialValue || "")
 
@@ -68,33 +45,33 @@ export function Combobox({ value: initialValue, className, disabled, onChange }:
           disabled={disabled}
         >
           { value
-              ? departments.find((department) => department.value === value)?.label
-              : "Selecione o setor..."
+              ? items && items.find((item) => item.value === value)?.label
+              : defaultTitle ? defaultTitle : "Selecione..."
           }
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0">
         <Command>
-          <CommandInput placeholder="Pesquise o setor..." />
+          <CommandInput placeholder={defaultComandPlaceHolder ? defaultComandPlaceHolder : "Pesquise..."} />
           <CommandList>
-            <CommandEmpty>Nenhum setor encontrado.</CommandEmpty>
+            <CommandEmpty>{defaultComandEmpty ? defaultComandEmpty : "Nenhum registro encontrado."}</CommandEmpty>
             <CommandGroup>
-              {departments.map((department) => (
+              {items && items.map((item) => (
                 <CommandItem
-                  key={department.value}
-                  value={department.value}
+                  key={item.value}
+                  value={item.value}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
                     setOpen(false)
                     onChange?.(currentValue)
                   }}
                 >
-                  {department.label}
+                  {item.label}
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === department.value ? "opacity-100" : "opacity-0"
+                      value === item.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>

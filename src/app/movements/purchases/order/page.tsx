@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import {
     Table,
     TableCaption,
@@ -13,23 +12,7 @@ import {
     TableFooter,
     TableCell
 } from '@/components/ui/table'
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter
-} from '@/components/ui/dialog'
-import { v4 as uuidv4 } from 'uuid'
-import { CalendarIcon, Edit, MoreVertical, PackageX, Plus, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger
-} from '@/components/ui/popover'
-import { ptBR } from 'date-fns/locale'
+import { Edit, MoreVertical, PackageX, Plus, X } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -37,7 +20,6 @@ import {
     DropdownMenuItem
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
-import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
     AlertDialog,
@@ -50,70 +32,56 @@ import {
     AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Purchase, Status } from '@prisma/client'
-import { Combobox } from '@/components/ui/combobox'
 import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
 // import CalendarDatePicker from '@/components/CalendarDatePicker'
 import NotFound from '@/components/NotFound'
+import { useRouter } from 'next/navigation'
+import { usePurchase } from '@/contexts/PurchaseContext'
 
 export default function Order() {
-    const { user, companySelected } = useUser();
+    const { push } = useRouter()
+    const { setPage, setMode, setPurchase } = usePurchase()
+    const { user, companySelected } = useUser()
     
     // const [date, setDate] = useState<Date>(new Date())
 
     const [orders, setOrders] = useState<Purchase[]>([])
-    const [isDialogOpen, setDialogOpen] = useState(false)
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
-    const [visualize, setVisualize] = useState(false)
     const [currentOrder, setCurrentOrder] = useState<Purchase | null>(null)
 
     const handleOpenDialog = (order: Purchase | null = null) => {
-        setCurrentOrder(order || {
-            id: '',
-            companyId: '',
-            date: new Date(),
-            delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
-            user_id: user ? user.id : '',
-            supplier: '',
-            product: '',
-            quantity: 0,
-            value: 0,
-            status: Status.Aberta,
-            department: '',
-            observations: '',
-            updated_at: null
-        })
-        setDialogOpen(true)
-    }
-
-    const handleCloseDialog = () => {
-        setCurrentOrder({
-            id: '',
-            companyId: '',
-            date: new Date(),
-            delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
-            user_id: user ? user.id : '',
-            supplier: '',
-            product: '',
-            quantity: 0,
-            value: 0,
-            status: Status.Aberta,
-            department: '',
-            observations: '',
-            updated_at: null
-        })
-        setDialogOpen(false)
-        setVisualize(false)
+        if (order) {
+            setMode('edit')
+            setPurchase({...order, items: []})
+        } else {
+            setMode('new')
+            setPurchase({
+                id: '',
+                companyId: '',
+                date: new Date(),
+                delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
+                user_id: user ? user.id : '',
+                supplier: '',
+                total_value: 0,
+                status: Status.Recebida,
+                department: '',
+                observations: '',
+                updated_at: null,
+                items: []
+            })
+        }
+        setPage('order')
+        push('/movements/purchases/new')
     }
 
     const handleItemDoubleClick = async (order: Purchase) => {
-        setCurrentOrder(order)
-        setVisualize(true)
-        setDialogOpen(true)
+        setMode('visualize')
+        setPurchase({...order, items: []})
+        setPage('order')
+        push('/movements/purchases/new')
     }
 
     const handleOpenAlertDialog = (order: Purchase) => {
@@ -141,76 +109,21 @@ export default function Order() {
             }
 
             const data = await response.json()
+            // const orderAnt = orders 
             setOrders(prevOrders => prevOrders.filter(order => order.id !== data.id));
             toast.success(data.message, {
                 // description: "Clique aqui se deseja restaurar a ordem",
                 // action: {
-                    //   label: "Restaurar",
-                    //   onClick: () => console.log("Restaurar"),
+                //       label: "Restaurar",
+                //       onClick: () => setOrders(orderAnt),
                 // },
             })
             setIsAlertDialogOpen(false)
         } catch (error) {
             console.error(error)
-            alert('Ocorreu um erro ao cancelar a ordem. Tente novamente mais tarde: ' + error)
+            toast.error('Ocorreu um erro ao cancelar a ordem. Tente novamente mais tarde: ' + error)
         } finally {
             setIsDeleting(false)
-        }
-    }
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setIsSubmitting(true)
-
-        if (!currentOrder) return
-
-        if (currentOrder.department === null || currentOrder.department === '' || currentOrder.product === '' || currentOrder.quantity <= 0) {
-            toast.error('Preencha todos os campos corretamente')
-            setIsSubmitting(false)
-            return
-        }
-
-        const newOrder: Purchase = {
-            id: currentOrder.id !== '' ? currentOrder.id : uuidv4(),
-            companyId: companySelected ? companySelected.id : '',
-            date: currentOrder.id !== '' ? currentOrder.date : new Date(),
-            user_id: user ? user.id : '',
-            supplier: currentOrder.supplier,
-            status: currentOrder.id !== '' ? currentOrder.status : Status.Aberta,
-            value: currentOrder.value,
-            delivery_date: currentOrder.delivery_date,
-            product: currentOrder.product,
-            quantity: currentOrder.quantity,
-            department: currentOrder.department,
-            observations: currentOrder.observations,
-            updated_at: new Date()
-        }
-
-        try {
-            const method = currentOrder.id ? 'PUT' : 'POST'
-            
-            const response = await FetchAPI({
-                URL: '/api/purchases',
-                method,
-                body: JSON.stringify(newOrder)
-            })
-
-            if (!response.ok) {
-                throw new Error('Erro ao salvar a ordem: ' + response.statusText)
-            }
-
-            const data = await response.json()
-            if (currentOrder.id) {
-                setOrders(prevOrders => prevOrders.map(order => order.id === data.id ? data : order))
-            } else {
-                setOrders(prevOrders => [...prevOrders, data])
-            }
-            handleCloseDialog()
-        } catch (error) {
-            console.error('Erro ao salvar a ordem: ', error)
-            alert('Ocorreu um erro ao salvar a ordem. Tente novamente mais tarde: ' + error)
-        } finally {
-            setIsSubmitting(false)
         }
     }
 
@@ -253,7 +166,7 @@ export default function Order() {
                     onSelect={(dt) => setDate(dt ? dt : new Date())}
                     className="w-auto"
                 /> */}
-                <Button 
+                <Button
                     onClick={() => handleOpenDialog()} 
                     className="bg-primary text-white w-10 sm:w-36 hover:bg-primary/80"
                 >
@@ -271,8 +184,8 @@ export default function Order() {
                             <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>
                             <TableHead className="w-[100px] sm:w-[120px] select-none">Data</TableHead>
                             <TableHead className="w-[100px] sm:w-[120px] select-none">Setor</TableHead>
-                            <TableHead className="select-none">Produto</TableHead>
-                            <TableHead className="w-[80px] sm:w-[150px] select-none">Quant.</TableHead>
+                            <TableHead className="select-none">Fornecedor</TableHead>
+                            <TableHead className="w-[80px] sm:w-[150px] select-none">Status</TableHead>
                             <TableHead className="w-[80px] sm:w-[150px] text-right select-none">Valor</TableHead>
                             <TableHead className="w-[35px] sm:w-[50px] text-right select-none">Ações</TableHead>
                         </TableRow>
@@ -308,13 +221,13 @@ export default function Order() {
                                     <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
                                     <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
                                     <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{order.department ? order.department : 'N . D'}</TableCell>
-                                    <TableCell className="select-none text-xs sm:text-base">{order.product}</TableCell>
-                                    <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{Number(order.quantity).toLocaleString('pt-BR')} UN</TableCell>
+                                    <TableCell className="select-none text-xs sm:text-base">{order.supplier ? order.supplier : 'N . D'}</TableCell>
+                                    <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{order.status ? order.status : 'N . D'}</TableCell>
                                     <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">
                                         {Intl.NumberFormat('pt-BR', {
                                             style: 'currency',
                                             currency: 'BRL',
-                                        }).format(order.value || 0)}
+                                        }).format(order.total_value || 0)}
                                     </TableCell>
                                     <TableCell className="w-[35px] sm:w-[50px] text-right select-none">
                                         <DropdownMenu>
@@ -341,8 +254,7 @@ export default function Order() {
                                                     <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                                     <AlertDialogDescription>
                                                         Deseja cancelar a ordem de compra?
-                                                        { currentOrder?.product && <><br />Produto: {currentOrder.product}</> }
-                                                        { currentOrder?.department && <><br />Setor: {currentOrder.department}</> }
+                                                        { currentOrder?.supplier && <><br />Fornecedor: {currentOrder.supplier}</> }
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
@@ -373,7 +285,7 @@ export default function Order() {
                                     currency: 'BRL',
                                 }).format(orders.reduce((total, order) => {
                                     if (order.status === Status.Faturada || order.status?.startsWith('Pedido')) {
-                                        return total + (order.quantity * (order.value || 0))
+                                        return total + (order.total_value || 0)
                                     }
                                     return total
                                 }, 0))}
@@ -383,155 +295,6 @@ export default function Order() {
                     </TableFooter>
                 </Table>
             }
-
-            <div className="flex justify-center items-center rounded-lg">
-                <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-                    <DialogContent className="max-w-[350px] max-h-[450px] sm:max-w-[425px] sm:max-h-[720px] lg:max-h-none">
-                        <DialogHeader>
-                            <DialogTitle className="text-lg sm:text-base">
-                                {
-                                    visualize ?
-                                        'Visualizar Ordem' : 
-                                    currentOrder?.id !== '' ?
-                                        'Editar Ordem' :
-                                        'Adicionar Ordem'
-                                }
-                            </DialogTitle>
-                            <DialogDescription className="text-sm sm:text-base">
-                                {
-                                    visualize ?
-                                        'Visualize a ordem de compra.' :
-                                    currentOrder?.id !== '' ?
-                                        'Faça alterações na ordem aqui. Clique em salvar quando terminar.' :
-                                        'Adicione uma nova ordem.'
-                                }
-                            </DialogDescription>
-                        </DialogHeader> 
-                        {   currentOrder && (
-                            <form onSubmit={handleSubmit} className="space-y-4 max-h-64 sm:max-h-72 lg:max-h-80 xl:max-h-96 2xl:max-h-none overflow-y-auto">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Previsão de Entrega</label>
-                                    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={"secondary"}
-                                                className={cn(
-                                                    "justify-start text-left font-normal w-full mt-1",
-                                                    !currentOrder.delivery_date && "text-muted-foreground",
-                                                    visualize && 'cursor-not-allowed'
-                                                )}
-                                                disabled={visualize}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {currentOrder?.delivery_date ? new Date(currentOrder.delivery_date).toLocaleDateString('pt-BR') : <span>Selecione a previsão de entrega</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="p-0 w-full">
-                                            <Calendar
-                                                mode="single"
-                                                selected={new Date(currentOrder.delivery_date)}
-                                                onSelect={(date) => setCurrentOrder({ ...currentOrder, delivery_date: date || new Date() })}
-                                                initialFocus
-                                                locale={ptBR}
-                                                title="Selecione a data de entrega"
-                                                onDayClick={() => setIsPopoverOpen(false)}
-                                                required
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>                            
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Setor</label>
-                                    <Combobox
-                                        value={currentOrder.department || ''}
-                                        className={cn("mt-1 w-full rounded-md shadow-sm p-2", visualize && 'cursor-not-allowed')}
-                                        disabled={visualize}
-                                        onChange={(value) => {
-                                            if (visualize) {
-                                                toast.error('Para fazer alterações, saia do modo de visualização e entre no modo de edição clicando no botão "Editar"')
-                                            } else {
-                                                setCurrentOrder({ ...currentOrder, department: value })
-                                            }
-                                        }} 
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Fornecedor</label>
-                                    <input 
-                                        type="text" 
-                                        value={currentOrder.supplier || ''} 
-                                        onChange={(e) => setCurrentOrder({ ...currentOrder, supplier: e.target.value })} 
-                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
-                                        required
-                                        disabled={visualize}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Produto</label>
-                                    <input 
-                                        type="text"
-                                        value={currentOrder.product}
-                                        onChange={(e) => setCurrentOrder({ ...currentOrder, product: e.target.value })} 
-                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
-                                        required
-                                        disabled={visualize}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Quantidade</label>
-                                    <input 
-                                        type="number" 
-                                        value={currentOrder.quantity}
-                                        onChange={(e) => setCurrentOrder({ ...currentOrder, quantity: Number(e.target.value) })} 
-                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
-                                        required
-                                        disabled={visualize}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Valor Unitário</label>
-                                    <input 
-                                        type="number" 
-                                        value={currentOrder.value || ''}
-                                        onChange={(e) => setCurrentOrder({ ...currentOrder, value: Number(e.target.value) })} 
-                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
-                                        required
-                                        disabled={visualize}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
-                                    <Textarea
-                                        value={currentOrder.observations || ''}
-                                        onChange={(e) => setCurrentOrder({ ...currentOrder, observations: e.target.value })} 
-                                        className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", visualize && 'cursor-not-allowed')}
-                                        disabled={visualize}
-                                    />
-                                </div>
-
-                                <DialogFooter>
-                                    {   visualize ? 
-                                        <Button
-                                            className="bg-primary text-white hover:bg-primary/80"
-                                            onClick={handleCloseDialog}
-                                        >
-                                            Fechar
-                                        </Button>
-                                        :
-                                        <Button 
-                                            type="submit"
-                                            className={`bg-green-500 text-white hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                            disabled={isSubmitting}
-                                        >
-                                            {isSubmitting ? 'Salvando...' : currentOrder.id !== '' ? 'Salvar Alterações' : 'Adicionar Ordem'}
-                                        </Button>
-                                    }
-                                </DialogFooter>
-                            </form>
-                        )}
-                    </DialogContent>
-                </Dialog>
-            </div>
         </div>
     );
 }

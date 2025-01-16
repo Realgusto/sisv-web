@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/providers/theme-provider"
 import { UserProvider } from "@/contexts/UserContext"
 import MainMenu from "@/components/ui/main-menu"
 import { Toaster } from "@/components/ui/sonner"
+import { PurchaseProvider } from "@/contexts/PurchaseContext"
 
 const mainFontFamily = Quicksand({
   variable: "--font-family-main",
@@ -33,6 +34,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <body
@@ -46,8 +48,10 @@ export default function RootLayout({
           enableSystem
         >
           <UserProvider>
-            <MainMenu />
-            {children}
+            <PurchaseProvider>
+              <MainMenu />
+              {children}
+            </PurchaseProvider>
           </UserProvider>
         </ThemeProvider>
         <Toaster />

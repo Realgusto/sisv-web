@@ -23,21 +23,33 @@ model User {
 }
 
 model Purchase {
-  id            String    @id @default(cuid())
+  id            String          @id @default(cuid())
   companyId     String
-  company       Company   @relation("Company", fields: [companyId], references: [id])
+  company       Company         @relation("Company", fields: [companyId], references: [id])
+  user_id       String
+  user          User            @relation("UserPurchases", fields: [user_id], references: [id])
   date          DateTime
   delivery_date DateTime
-  supplier      String?
-  product       String
-  quantity      Int
-  value         Float?
   department    String?
+  supplier      String?
+  total_value   Float?
   observations  String?
   status        Status?
-  user_id       String
-  updated_at    DateTime? @default(now()) @updatedAt
-  user          User      @relation("UserPurchases", fields: [user_id], references: [id])
+  updated_at    DateTime?       @default(now()) @updatedAt
+  PurchaseItems PurchaseItems[]
+}
+
+model PurchaseItems {
+  id         String   @default(cuid())
+  purchaseId String
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  product    String
+  quantity   Float
+  unitPrice  Float
+  total      Float
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@id([id, purchaseId])
 }
 
 model Overview {

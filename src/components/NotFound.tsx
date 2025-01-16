@@ -10,7 +10,7 @@ type NotFoundProps = {
 export default function NotFound({ title }: NotFoundProps) {
     return(
         <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
+            <div className="flex flex-col items-center justify-center h-[calc(80vh-15rem)]">  {/*  h-[calc(100vh-10rem)] */}
                 <Lottie
                     animationData={NotFoundJSON}
                     loop={true}
