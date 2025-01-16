@@ -6,7 +6,7 @@ import {
 
 const prisma = new PrismaClient()
 
-export async function GET(request: Request, { params }: { params: { purchaseId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ purchaseId: string }> }) {
     const { purchaseId } = await params;
 
     if (!purchaseId) {
