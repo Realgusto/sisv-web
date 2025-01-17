@@ -21,7 +21,7 @@ export function ThemeToggle() {
   return (
     <Hoverable className="right-0 top-9 min-w-18 bg-secondary text-secondary-foreground"
       renderHoverContent={() => (
-        <h2 className="text-sm font-medium select-none sm:text-base">
+        <h2 className="text-sm font-semibold select-none sm:text-base">
           {theme === 'light' ? 'Tema Claro' : 'Tema Escuro'}
         </h2>
       )}

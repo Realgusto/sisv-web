@@ -16,10 +16,10 @@ export default function CompanyID() {
                 <Hoverable className="right-0 top-9 min-w-44 bg-secondary text-secondary-foreground"
                     renderHoverContent={() => (
                         <>
-                            <h2 className="text-sm font-medium select-none sm:text-base">
+                            <h2 className="text-sm font-semibold select-none sm:text-base">
                                 {companySelected.fantasy ? companySelected.fantasy : companySelected.name}
                             </h2>
-                            <p className="text-xs select-none font-light">
+                            <p className="text-xs select-none font-normal">
                                 CNPJ: {companySelected.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")}
                             </p>
                         </>
