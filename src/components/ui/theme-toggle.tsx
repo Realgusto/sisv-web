@@ -4,6 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
+import Hoverable from '../Hoverable'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
@@ -19,15 +20,13 @@ export function ThemeToggle() {
   }
 
   return (
-    <>
-      { isHovering && (
-        <div className={`right-0 absolute min-w-18 mt-10 bg-secondary text-secondary-foreground p-3 rounded-md shadow-md transition-opacity duration-500 ${isHovering ? 'opacity-100' : 'opacity-0'}`}>
-            <h2 className="text-center text-sm font-medium select-none sm:text-base">
-                {theme === 'light' ? 'Dark' : 'Light'}
-            </h2>
-        </div>
+    <Hoverable className="right-0 top-9 min-w-18 bg-secondary text-secondary-foreground"
+      renderHoverContent={() => (
+        <h2 className="text-sm font-medium select-none sm:text-base">
+          {theme === 'light' ? 'Tema Claro' : 'Tema Escuro'}
+        </h2>
       )}
-      
+    >
       <Button
         variant="ghost"
         size={"default"}
@@ -39,6 +38,6 @@ export function ThemeToggle() {
         <Moon size={32} className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         <span className="sr-only">Alternar tema</span>
       </Button>
-    </>
+    </Hoverable>
   )
 } 
