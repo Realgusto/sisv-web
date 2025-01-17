@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { useUser } from '@/contexts/UserContext'
 import { ptBR } from 'date-fns/locale'
-import TitleCompany from '@/components/TitleCompany'
 import { useRouter } from 'next/navigation'
 import Loader from '@/components/ui/loader'
 import FetchAPI from '@/utils/fetch-api'
@@ -103,7 +102,6 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 space-y-4 w-full max-w-full overflow-x-hidden">
-      <TitleCompany />
       { overview.activeCustomers === 0 && overview.salesMonthly === 0 && overview.salesLastYear.length === 0 && overview.top5BestSeller.length === 0 && overview.averageTicket === 0 && overview.inactiveCustomers === 0 && overview.expenses === 0 && overview.shopping === 0 && overview.receipt === 0 && overview.payment === 0 ?
         <NotFound title='Nenhuma métrica encontrada para a empresa selecionada, por favor, selecione outra empresa ou tente novamente.' />
       :

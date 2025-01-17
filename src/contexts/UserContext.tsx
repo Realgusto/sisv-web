@@ -11,6 +11,7 @@ interface UserContextType {
   user: User | null
   companySelected: Company | null
   selectCompany: (company: Company) => void
+  clearCompany: () => void
   companies: Company[] | null
   login: (userData: User, companiesData: Company[]) => void
   logout: () => void
@@ -66,6 +67,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setCompanySelected(company)
   }
 
+  const clearCompany = () => {
+    setCompanySelected(null)
+  }
+
   const login = (userData: User, companiesData: Company[]) => {
     const ret = Cookies.set(TOKEN_KEY, userData.id, { expires: 1 })
     if (ret !== '') {
@@ -86,6 +91,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       user,
       companySelected,
       selectCompany,
+      clearCompany,
       companies,
       login,
       logout

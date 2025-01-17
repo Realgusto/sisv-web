@@ -26,6 +26,7 @@ import { useUser } from '@/contexts/UserContext'
 import { useRouter } from 'next/navigation'
 import FourEasyIcon from '../FourEasyIcon'
 import Link from 'next/link'
+import CompanyID from '../CompanyID'
 
 const MainMenu = () => {
   const { user, logout } = useUser()
@@ -36,7 +37,7 @@ const MainMenu = () => {
         { user ?
           <>
             {/* Menu completo visível em telas médias e grandes */}
-            <div className="hidden sm:flex flex-row">
+            <div className="hidden md:flex flex-row">
               <Link href={user.admin ? "/dashboard" : "/shortcuts"} className="flex flex-row items-center ml-2">
                 <FourEasyIcon height={30} width={30} />
                 <span className="sr-only">4Easy Tecnologia</span>
@@ -185,7 +186,7 @@ const MainMenu = () => {
             </div>
 
             {/* Menu simplificado visível em telas pequenas */}
-            <div className="flex sm:hidden">
+            <div className="flex md:hidden">
               <MenubarMenu>
                 <MenubarTrigger><MenuIcon size={24} /></MenubarTrigger>
                 <MenubarContent>
@@ -348,7 +349,10 @@ const MainMenu = () => {
         :
           <div />
         }
-        <ThemeToggle />
+        <div className="flex flex-row">
+          <CompanyID />
+          <ThemeToggle />
+        </div>
       </Menubar>
   )
 };
