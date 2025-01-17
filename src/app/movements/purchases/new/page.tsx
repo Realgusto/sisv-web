@@ -147,6 +147,7 @@ export default function NewPurchasePage() {
 
         const newOrder: Purchase & { items: PurchaseItems[] } = {
             id: newOrderId,
+            sequence: currentPurchase.id !== '' ? currentPurchase.sequence : 0,
             companyId: companySelected ? companySelected.id : '',
             user_id: user ? user.id : '',
             date: currentPurchase.date ? currentPurchase.date : new Date(),
@@ -180,7 +181,7 @@ export default function NewPurchasePage() {
             if (!response.ok) {
                 throw new Error(`Erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'o orçamento'}: ${response.statusText}`)
             } else {
-                toast.success(`${currentPage === 'order' ? 'Ordem' : 'Orçamento'} salvo com sucesso`)
+                toast.success(`${currentPage === 'order' ? 'Ordem salva' : 'Orçamento salvo'} com sucesso`)
                 clearPurchase()
                 back()
             }
@@ -250,7 +251,7 @@ export default function NewPurchasePage() {
                         <label className="block text-sm font-medium cursor-not-allowed text-gray-700 dark:text-zinc-400">N° da Ordem</label>
                         <input 
                             type="text" 
-                            value={currentPurchase.id || ''} 
+                            value={String(currentPurchase.sequence) || ''} 
                             // onChange={(e) => setPurchase({ ...currentPurchase, supplier: e.target.value })}
                             className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary cursor-not-allowed")}
                             // required

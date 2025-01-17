@@ -37,6 +37,7 @@ import FetchAPI from '@/utils/fetch-api'
 import NotFound from '@/components/NotFound'
 import { useRouter } from 'next/navigation'
 import { usePurchase } from '@/contexts/PurchaseContext'
+import { formatZero } from '@/utils'
 
 
 export default function Budget() {
@@ -67,6 +68,7 @@ export default function Budget() {
             setMode('new')
             setPurchase({
                 id: '',
+                sequence: 0,
                 companyId: '',
                 date: new Date(),
                 delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
@@ -181,7 +183,7 @@ export default function Budget() {
                         <TableCaption className="select-none">Uma lista dos seus orçamentos.</TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>
+                                <TableHead className="sm:w-[120px] select-none"><span className="ml-2">O.C</span></TableHead>
                                 <TableHead className="w-[100px] sm:w-[120px] select-none">Data</TableHead>
                                 <TableHead className="w-[100px] sm:w-[120px] select-none">Setor</TableHead>
                                 <TableHead className="select-none">Fornecedor</TableHead>
@@ -193,7 +195,7 @@ export default function Budget() {
                         <TableBody>
                             {   isLoading ? 
                                 <TableRow className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
-                                    <TableCell hidden className="h-[120px] sm:h-[80px]">
+                                    <TableCell className="h-[120px] sm:h-[80px]">
                                         <Skeleton className="h-10 w-full rounded-lg" />
                                     </TableCell>
                                     <TableCell className="w-[100px] sm:w-[120px]">
@@ -217,12 +219,12 @@ export default function Budget() {
                                 </TableRow>
                             :
                                 orders.map(order => (
-                                    <TableRow 
+                                    <TableRow
                                         key={order.id} 
                                         onDoubleClick={() => handleItemDoubleClick(order)} 
                                         className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800"
                                     >
-                                        <TableCell hidden className="font-light text-[10px] sm:text-xs sm:w-[30px]">{order.id}</TableCell>
+                                        <TableCell className="font-semibold text-xs sm:text-sm sm:w-[30px]"><span className="ml-2">{formatZero(order.sequence, 6)}</span></TableCell>
                                         <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
                                         <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{order.department ? order.department : 'N . D'}</TableCell>
                                         <TableCell className="select-none text-xs sm:text-base">{order.supplier ? order.supplier : 'N . D'}</TableCell>
@@ -244,8 +246,8 @@ export default function Budget() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent>
-                                                    <DropdownMenuItem onClick={() => {
-                                                        toast.info('Clique em "salvar" para criar uma ordem de compra a partir do orçamento.')
+                                                    <DropdownMenuItem className="text-green-500 hover:text-green-600" onClick={() => {
+                                                        toast.info('Revise o orçamento e clique em "salvar" para criar uma ordem de compra.')
                                                         handleChangeStatus(order)
                                                     }}>
                                                         <ClipboardPenLine className="h-3 w-3 mr-2" /> Gerar Ordem
@@ -288,7 +290,7 @@ export default function Budget() {
                         </TableBody>
                         <TableFooter>
                             <TableRow>
-                                <TableCell colSpan={4} className="select-none text-base font-bold">Total</TableCell>
+                                <TableCell colSpan={5} className="select-none text-base font-bold">Total</TableCell>
                                 <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-base font-bold">
                                     {Intl.NumberFormat('pt-BR', {
                                         style: 'currency',

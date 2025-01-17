@@ -23,6 +23,7 @@ export const PurchaseProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [currentPurchase, setCurrentPurchase] = useState<Purchase & { items: PurchaseItems[] }>({
     id: '',
+    sequence: 0,
     companyId: '',
     user_id: '',
     date: new Date(),
@@ -38,26 +39,30 @@ export const PurchaseProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     (async () => {
-      setIsLoading(true)
-
-      if (currentPurchase.id !== '') {
-        const response = await FetchAPI({
+      try {
+        setIsLoading(true)
+        if (currentPurchase.id !== '') {
+          const response = await FetchAPI({
           method: 'GET',
           URL: `/api/purchases/${currentPurchase.id}`,
         })
         const data = await response.json()
         const { items } = data
 
-        setCurrentPurchase({ ...currentPurchase, items })
+          setCurrentPurchase({ ...currentPurchase, items })
+        }
+      } catch (error) {
+        console.error('Error fetching purchase data:', error)
+      } finally {
+        setIsLoading(false)
       }
-
-      setIsLoading(false)
     })()
-  }, [currentPurchase.id, currentPurchase])
+  }, [currentPurchase.id])
 
   const clearPurchase = () => {
     setCurrentPurchase({
       id: '',
+      sequence: 0,
       companyId: '',
       user_id: '',
       date: new Date(),

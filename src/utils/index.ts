@@ -40,3 +40,10 @@ export const format = (value: number, isCurrency: boolean = true) => {
     return value.toString() // Retorna o valor como string se não for K ou M
   }
 }
+
+export const formatZero = (value: number, length: number) => {
+  if (value === 0) {
+    return '0'.repeat(length)
+  }
+  return value.toString().padStart(length, '0')
+}
