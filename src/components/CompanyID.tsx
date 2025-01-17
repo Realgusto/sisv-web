@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from "react"
 import { useUser } from "@/contexts/UserContext"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
@@ -14,7 +13,7 @@ export default function CompanyID() {
     return (
         <>
             {companySelected && (
-                <Hoverable className="right-0 top-8 min-w-44 bg-secondary text-secondary-foreground"
+                <Hoverable className="right-0 top-9 min-w-44 bg-secondary text-secondary-foreground"
                     renderHoverContent={() => (
                         <>
                             <h2 className="text-sm font-medium select-none sm:text-base">

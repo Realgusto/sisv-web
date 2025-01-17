@@ -9,7 +9,6 @@ import Hoverable from '../Hoverable'
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
-  const [isHovering, setIsHovering] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -31,8 +30,6 @@ export function ThemeToggle() {
         variant="ghost"
         size={"default"}
         onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseOut={() => setIsHovering(false)}
       >
         <Sun size={32} className="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon size={32} className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
