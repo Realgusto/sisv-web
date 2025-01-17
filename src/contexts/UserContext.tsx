@@ -2,10 +2,11 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import Cookies from 'js-cookie'
-import { TOKEN_KEY, URL_ENTRY } from '@/constants'
+import { COMPANY_KEY, TOKEN_KEY, URL_ADMIN, URL_ENTRY, URL_NON_ADMIN } from '@/constants'
 import { useRouter } from 'next/navigation'
 import { Company, User } from '@prisma/client'
 import FetchAPI from '@/utils/fetch-api'
+import { toast } from 'sonner'
 
 interface UserContextType {
   user: User | null
@@ -30,7 +31,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     (async() => {
       try {
         const id = Cookies.get(TOKEN_KEY)
-              
+
         if (id) {
           const res = await FetchAPI({
               URL: '/api/users?id='+id,
@@ -39,36 +40,63 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           const user: User | null = res.ok ? await res.json() : null
 
           if (user) {
-            const response = await FetchAPI({ 
-              URL: '/api/companies?userId='+id,
-              method: 'GET'
-            })
-      
-            const companies: Company[] | null = response.ok ? await response.json() : null
+            const companyId = Cookies.get(COMPANY_KEY)
             
-            if (companies) {
-              setUser(user)
-              setCompanies(companies)
-              push(URL_ENTRY)
+            if (companyId) {
+              const response = await FetchAPI({ 
+                URL: '/api/companies/'+companyId,
+                method: 'GET'
+              })
+              const company: Company | null = response.ok ? await response.json() : null
+
+              if (company) {
+                setUser(user)
+                setCompanySelected(company)
+              } else {
+                push(URL_ENTRY)
+              }
             } else {
-              push('/login')
+              const response = await FetchAPI({ 
+                URL: '/api/companies?userId='+id,
+                method: 'GET'
+              })
+      
+              const companies: Company[] | null = response.ok ? await response.json() : null
+              
+              if (companies) {
+                setUser(user)
+                setCompanies(companies)
+                push(URL_ENTRY)
+              } else {
+                push('/login')
+              }
             }
           }
         } else {
           push('/login')
         }
       } catch (error) {
-        console.error('Erro ao buscar usuário logado: ', error)
+        console.error('Erro ao buscar usuário e empresa: ', error)
       }
     })()
   }, [push])
 
   const selectCompany = (company: Company) => {
     setCompanySelected(company)
+    const ret = Cookies.set(COMPANY_KEY, company.id, { expires: 1 })
+    if (ret && ret !== '') {
+      if (user?.admin) {
+        push(URL_ADMIN)
+      } else {
+        push(URL_NON_ADMIN)
+      }
+    }
   }
 
   const clearCompany = () => {
     setCompanySelected(null)
+    Cookies.remove(COMPANY_KEY)
+    push(URL_ENTRY)
   }
 
   const login = (userData: User, companiesData: Company[]) => {
@@ -82,7 +110,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null)
+    setCompanySelected(null)
     Cookies.remove(TOKEN_KEY)
+    Cookies.remove(COMPANY_KEY)
     push('/login')
   };
 

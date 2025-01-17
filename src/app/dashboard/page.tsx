@@ -37,7 +37,7 @@ export default function Dashboard() {
       const id = (new Date().getMonth() + 1).toString().padStart(2, '0') + new Date().getFullYear().toString()
   
       const response = await FetchAPI({
-        URL: `/api/overview?id=${id}&companyId=${companySelected.id}`,
+        URL: `/api/overview?id=${id}&companyId=${companySelected?.id}`,
         method: 'GET'
       })
 
@@ -90,7 +90,6 @@ export default function Dashboard() {
         }))
       }
     };
-
     fetchData()
   }, [companySelected, push])
 

@@ -2,18 +2,19 @@
 
 import { useEffect } from "react";
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import { URL_ENTRY } from "@/constants";
 
 export default function Page() {
-    const user = useUser()
+    const { user } = useUser()
+    const { push } = useRouter()
     
     useEffect(() => {
         if (user) {
-            redirect(URL_ENTRY)
+            push(URL_ENTRY)
         } else {
-            redirect('/login')
+            push('/login')
         }
     }, [user])
 

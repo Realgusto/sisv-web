@@ -11,16 +11,31 @@ import { useUser } from "@/contexts/UserContext"
 import { useRouter } from 'next/navigation'
 import type { Company } from "@prisma/client"
 import { ExternalLink } from "lucide-react"
+import { URL_ADMIN, URL_NON_ADMIN } from "@/constants"
+import { useEffect } from "react"
 
 export default function Companies() {
     const { push } = useRouter()
-    const { companies, selectCompany } = useUser()
+    const { user, companies, companySelected, selectCompany } = useUser()
+
+    useEffect(() => {
+        if (companySelected) {
+            if (user?.admin) {
+                push(URL_ADMIN)
+            } else {
+                push(URL_NON_ADMIN)
+            }
+        }
+    }, [companySelected])
 
     const clickCompany = (company: Company) => {
         selectCompany(company)
-        console.log(company)
-        push('/dashboard')
-    }    
+        if (user?.admin) {
+            push(URL_ADMIN)
+        } else {
+            push(URL_NON_ADMIN)
+        }
+    }
 
     const styleCard = "h-48 transition duration-400 ease-in-out transform hover:-translate-y-1 hover:shadow-sm hover:border-primary/80 hover:shadow-muted-foreground/75 select-none hover:cursor-pointer"
     
