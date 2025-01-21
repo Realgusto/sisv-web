@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { useTheme } from "next-themes"
+// import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Printer, X } from "lucide-react"
@@ -27,7 +27,7 @@ import html2pdf from 'js-html2pdf'
 
 export default function PrintPurchasePage() {
     const { back } = useRouter()
-    const { theme, setTheme } = useTheme()
+    // const { theme, setTheme } = useTheme()
 
     const { companySelected } = useUser()
 
