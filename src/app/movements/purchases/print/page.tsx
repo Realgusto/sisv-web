@@ -25,7 +25,7 @@ import { useUser } from "@/contexts/UserContext"
 import dynamic from 'next/dynamic'
 import { useReactToPrint } from "react-to-print"
  
-dynamic(
+const html2pdf = dynamic(
   () => import('js-html2pdf'),
   { ssr: false }
 )
