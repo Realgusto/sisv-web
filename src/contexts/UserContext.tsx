@@ -6,7 +6,6 @@ import { COMPANY_KEY, TOKEN_KEY, URL_ADMIN, URL_ENTRY, URL_NON_ADMIN } from '@/c
 import { useRouter } from 'next/navigation'
 import { Company, User } from '@prisma/client'
 import FetchAPI from '@/utils/fetch-api'
-import { toast } from 'sonner'
 
 interface UserContextType {
   user: User | null

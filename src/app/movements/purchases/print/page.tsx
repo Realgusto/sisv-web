@@ -4,7 +4,7 @@ import { useRef } from "react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Printer, X } from "lucide-react"
+import { Printer, X } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { usePurchase } from "@/contexts/PurchaseContext"
@@ -146,7 +146,6 @@ export default function PrintPurchasePage() {
                                 !currentPurchase.date && "text-muted-foreground"
                             )}
                         >
-                            {/* <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" /> */}
                             <h1 className="text-lg">{currentPurchase.date ? new Date(currentPurchase.date).toLocaleDateString('pt-BR') : <span>Nenhuma data selecionada</span>}</h1>
                         </div>
                     </div>
@@ -158,7 +157,6 @@ export default function PrintPurchasePage() {
                                 !currentPurchase.delivery_date && "text-muted-foreground"
                             )}
                         >
-                            {/* <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" /> */}
                             <h1 className="text-lg">{currentPurchase.delivery_date ? new Date(currentPurchase.delivery_date).toLocaleDateString('pt-BR') : <span>Nenhuma previsão selecionada</span>}</h1>
                         </div>
                     </div>                            
