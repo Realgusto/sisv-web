@@ -100,6 +100,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const login = (userData: User, companiesData: Company[]) => {
+    Cookies.remove(COMPANY_KEY)
     const ret = Cookies.set(TOKEN_KEY, userData.id, { expires: 1 })
     if (ret !== '') {
       push(URL_ENTRY)

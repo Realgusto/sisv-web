@@ -52,6 +52,7 @@ import {
     AlertDialogCancel
 } from "@/components/ui/alert-dialog"
 import Loader from "@/components/ui/loader"
+import { formatZero } from "@/utils"
 
 export default function NewPurchasePage() {
     const { back } = useRouter()
@@ -251,7 +252,7 @@ export default function NewPurchasePage() {
                         <label className="block text-sm font-medium cursor-not-allowed text-gray-700 dark:text-zinc-400">N° da Ordem</label>
                         <input 
                             type="text" 
-                            value={String(currentPurchase.sequence) || ''} 
+                            value={String(formatZero(currentPurchase.sequence, 6)) || ''} 
                             // onChange={(e) => setPurchase({ ...currentPurchase, supplier: e.target.value })}
                             className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary cursor-not-allowed")}
                             // required

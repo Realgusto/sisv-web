@@ -12,7 +12,15 @@ import {
     TableFooter,
     TableCell
 } from '@/components/ui/table'
-import { Fingerprint, Edit, MoreVertical, PackageX, Plus, X, Send } from 'lucide-react'
+import {
+    Fingerprint,
+    Edit,
+    MoreVertical,
+    PackageX,
+    Plus,
+    X,
+    File
+} from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -136,6 +144,12 @@ export default function Order() {
         }
     }
 
+    const handleSendOrder = async (order: Purchase) => {
+        setPurchase({ ...order, items: [] })
+        setPage('order')
+        push('/movements/purchases/print')
+    }
+
     useEffect(() => {
         const fetchOrders = async () => {
             setIsLoading(true)
@@ -250,24 +264,21 @@ export default function Order() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
                                                 {   order.status === Status.Recebida ?
-                                                    <DropdownMenuItem className="text-green-500 hover:text-green-600" onClick={() => {
+                                                    <DropdownMenuItem className="text-green-600" onClick={() => {
                                                         toast.info('Revise a ordem e clique em "salvar" para autorizar.')
                                                         handleAutorize(order)
                                                     }}>
                                                         <Fingerprint className="h-3 w-3 mr-2" /> Autorizar
                                                     </DropdownMenuItem>
                                                     : order.status === Status.Autorizada &&
-                                                    <DropdownMenuItem className="text-green-500 hover:text-green-600" onClick={() => {
-                                                        // toast.info('Revise a ordem e clique em "salvar" para autorizar.')
-                                                        // handleAutorize(order)
-                                                    }}>
-                                                        <Send className="h-3 w-3 mr-2" /> Enviar
+                                                    <DropdownMenuItem className="text-green-600" onClick={() => handleSendOrder(order)}>
+                                                        <File className="h-3 w-3 mr-2" /> Gerar
                                                     </DropdownMenuItem>
                                                 }
                                                 <DropdownMenuItem onClick={() => handleOpenDialog(order)}>
                                                     <Edit className="h-3 w-3 mr-2" /> Editar
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="text-red-400 hover:text-red-500" onClick={() => handleOpenAlertDialog(order)}>
+                                                <DropdownMenuItem className="text-red-500" onClick={() => handleOpenAlertDialog(order)}>
                                                     <PackageX className="h-3 w-3 mr-2" /> Cancelar
                                                 </DropdownMenuItem>                                            
                                             </DropdownMenuContent>
