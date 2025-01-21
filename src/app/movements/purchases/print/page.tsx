@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useEffect } from "react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -89,6 +89,12 @@ export default function PrintPurchasePage() {
             toast.error('Error in ' + location + ': ' + error)
         }
     })
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            // Aqui você pode colocar o código que depende do objeto window
+        }
+    }, [])
 
     return (
         <>
