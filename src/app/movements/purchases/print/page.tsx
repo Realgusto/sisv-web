@@ -45,31 +45,33 @@ export default function PrintPurchasePage() {
         contentRef: printRef,
         documentTitle: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
         print: async (printIFrame) => {
-            const document = printIFrame.contentDocument
+            if (typeof window !== "undefined") {
+                const document = printIFrame.contentDocument
 
-            if (document) {
-                const print = document.getElementById('print')
-                const options = {
-                    margin: 0,
-                    filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  {
-                        scale: 1,
-                        logging: true,
-                        dpi: 192,
-                        letterRendering: true,
-                    },
-                    jsPDF: {
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: [210, 297],
-                    },
+                if (document) {
+                    const print = document.getElementById('print')
+                    const options = {
+                        margin: 0,
+                        filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  {
+                            scale: 1,
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                        },
+                        jsPDF: {
+                            orientation: 'portrait',
+                            unit: 'mm',
+                            format: [210, 297],
+                        },
+                    }
+
+                    const exporter = new html2pdf(print, options)
+                    await exporter.getPdf(options)
+                } else {
+                    toast.error('Erro ao gerar: Documento não encontrado.')
                 }
-
-                const exporter = new html2pdf(print, options)
-                await exporter.getPdf(options)
-            } else {
-                toast.error('Erro ao gerar: Documento não encontrado.')
             }
         },
         onBeforePrint: async () => {
