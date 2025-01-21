@@ -26,7 +26,7 @@ export default function Companies() {
                 push(URL_NON_ADMIN)
             }
         }
-    }, [companySelected, user?.admin])
+    }, [companySelected, user?.admin, push])
 
     const clickCompany = (company: Company) => {
         selectCompany(company)

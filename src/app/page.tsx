@@ -19,7 +19,7 @@ export default function Page() {
         } else {
             push('/login')
         }
-    }, [user])
+    }, [user, push])
 
     return <div className="flex h-screen w-screen items-center justify-center font-bold text-2xl text-primary">Redirecionando...</div>
 }

@@ -49,7 +49,7 @@ export const PurchaseProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json()
         const { items } = data
 
-          setCurrentPurchase({ ...currentPurchase, items })
+          setCurrentPurchase(purchase => ({ ...purchase, items }))
         }
       } catch (error) {
         console.error('Error fetching purchase data:', error)
