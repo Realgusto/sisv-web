@@ -20,10 +20,16 @@ import {
 } from "@/components/ui/table"
 import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
-import { useReactToPrint } from "react-to-print"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
-import html2pdf from 'js-html2pdf'
+import dynamic from 'next/dynamic'
+import { useReactToPrint } from "react-to-print"
+ 
+dynamic(
+  () => import('js-html2pdf'),
+  { ssr: false }
+)
+
 
 export default function PrintPurchasePage() {
     const { back } = useRouter()
