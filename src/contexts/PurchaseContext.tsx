@@ -5,12 +5,33 @@ import { Purchase, PurchaseItems, Status } from '@prisma/client'
 import FetchAPI from '@/utils/fetch-api'
 
 interface PurchaseContextType {
+  /**
+   * Indicates if the purchase is loading.
+   */
   isLoading: boolean
+  /**
+   * Indicates whether the purchase is a budget or an order.
+   */
   currentPage: 'order' | 'budget' | ''
+  /**
+   * Set the current page.
+   */
   setPage: (page: 'order' | 'budget' | '') => void
+  /**
+   * Indicates the current mode.
+   */
   currentMode: 'new' | 'edit' | 'visualize'
+  /**
+   * Set the current mode.
+   */
   setMode: (mode: 'new' | 'edit' | 'visualize') => void
+  /**
+   * The current purchase.
+   */
   currentPurchase: Purchase & { items: PurchaseItems[] }
+  /**
+   * Set the current purchase.
+   */
   setPurchase: (data: Purchase & { items: PurchaseItems[] }) => void
   /**
    * Clear the current purchase.
