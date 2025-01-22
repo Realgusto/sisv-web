@@ -6,9 +6,14 @@ import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
-import { Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, PDFViewer, Font } from '@react-pdf/renderer'
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+
+Font.register({
+    family: 'Quicksand',
+    src: 'http://fonts.gstatic.com/s/quicksand/v6/sKd0EMYPAh5PYCRKSryvW6CWcynf_cDxXwCLxiixG1c.ttf',
+})
 
 const styles = StyleSheet.create({
     page: {
@@ -20,6 +25,7 @@ const styles = StyleSheet.create({
         bottom: 12,
         right: 12,
         fontSize: 10,
+        fontFamily: 'Quicksand',
     },
     border: {
         borderBottomWidth: 1,
@@ -31,26 +37,32 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        fontFamily: 'Quicksand',
     },
     headerCompany: {
         fontSize: 20,
         color: '#303030',
+        fontFamily: 'Quicksand',
     },
     headerAddress: {
         fontSize: 14,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
     headerPhone: {
         fontSize: 14,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
     headerTitle: {
         fontSize: 12,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
     headerText: {
         fontSize: 18,
-        color: 'var(--foreground)'
+        color: 'var(--foreground)',
+        fontFamily: 'Quicksand',
     },
     content: {
         paddingVertical: 20,
@@ -64,10 +76,12 @@ const styles = StyleSheet.create({
     contentHeaderTitle: {
         fontSize: 12,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
     contentHeaderText: {
         fontSize: 12,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
     contentItem: {
         flexDirection: 'row',
@@ -77,6 +91,7 @@ const styles = StyleSheet.create({
     contentItemText: {
         fontSize: 16,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
     contentFooter: {
         flexDirection: 'row',
@@ -86,6 +101,7 @@ const styles = StyleSheet.create({
     contentFooterText: {
         fontSize: 16,
         color: '#444444',
+        fontFamily: 'Quicksand',
     },
 })
 
@@ -109,7 +125,7 @@ export default function PrintPurchasePage() {
 
     return (
         <>
-            <div className="p-4 sm:p-6 flex items-center justify-end">
+            <div className="p-4 sm:p-6 flex items-center">
                 <Button className="bg-primary text-white w-10 sm:w-36 hover:bg-primary/80" onClick={handleBack}>
                     <ArrowLeft className="h-5 w-5" />
                     <span className="hidden sm:block ml-2">Voltar</span>
@@ -118,9 +134,9 @@ export default function PrintPurchasePage() {
             {   isLoading ?
                     <Loader />
                 :
-                currentPurchase.items.length === 0 ?
+                !currentPurchase || currentPurchase.items.length === 0 ?
                     <NotFound
-                        title='Nenhum item encontrado.'
+                        title='Nenhum documento encontrado.'
                     />
                 :
                     <PDFViewer className="mt-1 w-full h-screen">
