@@ -12,13 +12,13 @@ import { ArrowLeft } from "lucide-react"
 
 const styles = StyleSheet.create({
     page: {
-        backgroundColor: '#E4E4E4',
+        backgroundColor: '#FFFFFF',
         padding: 20,
     },
     counter: {
         position: 'absolute',
-        bottom: 6,
-        right: 6,
+        bottom: 12,
+        right: 12,
         fontSize: 10,
     },
     border: {
