@@ -7,6 +7,8 @@ import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
 import { Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer'
+import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
 
 const styles = StyleSheet.create({
     page: {
@@ -100,8 +102,19 @@ export default function PrintPurchasePage() {
         clearPurchase
     } = usePurchase()
 
+    const handleBack = () => {
+        back()
+        clearPurchase()
+    }
+
     return (
         <>
+            <div className="p-4 sm:p-6 flex items-center justify-end">
+                <Button className="bg-primary text-white w-10 sm:w-36 hover:bg-primary/80" onClick={handleBack}>
+                    <ArrowLeft className="h-5 w-5" />
+                    <span className="hidden sm:block ml-2">Voltar</span>
+                </Button>
+            </div>
             {   isLoading ?
                     <Loader />
                 :
@@ -110,7 +123,7 @@ export default function PrintPurchasePage() {
                         title='Nenhum item encontrado.'
                     />
                 :
-                    <PDFViewer className="mt-4 mx-4 w-full h-screen">
+                    <PDFViewer className="mt-1 w-full h-screen">
                         <Document
                             title={companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6)}
                             author={companySelected?.fantasy ? companySelected?.fantasy : companySelected?.name}

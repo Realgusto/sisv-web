@@ -12,6 +12,9 @@ interface PurchaseContextType {
   setMode: (mode: 'new' | 'edit' | 'visualize') => void
   currentPurchase: Purchase & { items: PurchaseItems[] }
   setPurchase: (data: Purchase & { items: PurchaseItems[] }) => void
+  /**
+   * Clear the current purchase.
+   */
   clearPurchase: () => void
 }
 
