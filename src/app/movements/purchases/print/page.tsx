@@ -1,11 +1,11 @@
 "use client"
 
 import { useRef } from "react"
-// import { useTheme } from "next-themes"
+import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Printer, X } from "lucide-react"
-// import { toast } from "sonner"
+import { File, X } from "lucide-react"
+import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { usePurchase } from "@/contexts/PurchaseContext"
 import {
@@ -22,12 +22,12 @@ import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
-// import { useReactToPrint } from "react-to-print"
-import html2pdf from 'js-html2pdf'
+import { useReactToPrint } from "react-to-print"
+// import html2pdf from 'js-html2pdf'
 
 export default function PrintPurchasePage() {
     const { back } = useRouter()
-    // const { theme, setTheme } = useTheme()
+    const { theme, setTheme } = useTheme()
 
     const { companySelected } = useUser()
 
@@ -38,83 +38,73 @@ export default function PrintPurchasePage() {
         clearPurchase
     } = usePurchase()
 
-    // let actualThemeMode: string = ''
+    // useEffect(() => {
+    //     if (typeof window !== "undefined") {
+    //         const print = document.getElementById('print')
+    //         if (print) {
+    //             const options = {
+    //                 margin: 0,
+    //                 filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
+    //             }
+    //             const exporter = html2pdf(print, options)
+    //             exporter.getPdf(options)
+    //         }
+    //     }
+    // }, [])
+
+    let actualThemeMode: string = ''
 
     const printRef = useRef(null)
-    const handlePrint = async () => {
-        if (typeof window !== "undefined") {
-            const options = {
-                margin: 0,
-                filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas:  {
-                    scale: 1,
-                    logging: true,
-                    dpi: 192,
-                    letterRendering: true,
-                },
-                jsPDF: {
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: [210, 297],
-                },
+    const handlePrint = useReactToPrint({
+        contentRef: printRef,
+        documentTitle: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
+        // print: async (printIFrame) => {
+        //     if (typeof window !== "undefined") {
+        //         const document = printIFrame.contentDocument
+
+        //         if (document) {
+        //             const print = document
+        //             const options = {
+        //                 margin: 0,
+        //                 filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
+        //                 image: { type: 'jpeg', quality: 0.98 },
+        //                 html2canvas:  {
+        //                     scale: 1,
+        //                     logging: true,
+        //                     dpi: 192,
+        //                     letterRendering: true,
+        //                 },
+        //                 jsPDF: {
+        //                     orientation: 'portrait',
+        //                     unit: 'mm',
+        //                     format: [210, 297],
+        //                 },
+        //             }
+
+        //             const exporter = html2pdf(print, options)
+        //             await exporter.getPdf(options)
+        //         } else {
+        //             toast.error('Erro ao gerar: Documento não encontrado.')
+        //         }
+        //     }
+        // },
+        onBeforePrint: async () => {
+            actualThemeMode = theme ? theme : ''
+            if (theme === 'dark') {
+                setTheme('light')
             }
-
-            const pdf = html2pdf().from(printRef.current).set(options)
-            await pdf.save()
+            toast.success('Gerando documento...')
+        },
+        onAfterPrint: () => {
+            if (actualThemeMode !== '') {
+                setTheme(actualThemeMode)
+            }
+            toast.success('Ordem gerada com sucesso!')
+        },
+        onPrintError: (location, error) => {
+            toast.error('Error in ' + location + ': ' + error)
         }
-    }
-
-    // const handlePrint = useReactToPrint({
-    //     contentRef: printRef,
-    //     documentTitle: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-    //     print: async (printIFrame) => {
-    //         if (typeof window !== "undefined") {
-    //             const document = printIFrame.contentDocument
-
-    //             if (document) {
-    //                 const print = document.getElementById('print')
-    //                 const options = {
-    //                     margin: 0,
-    //                     filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-    //                     image: { type: 'jpeg', quality: 0.98 },
-    //                     html2canvas:  {
-    //                         scale: 1,
-    //                         logging: true,
-    //                         dpi: 192,
-    //                         letterRendering: true,
-    //                     },
-    //                     jsPDF: {
-    //                         orientation: 'portrait',
-    //                         unit: 'mm',
-    //                         format: [210, 297],
-    //                     },
-    //                 }
-
-    //                 const exporter = new html2pdf(print, options)
-    //                 await exporter.getPdf(options)
-    //             } else {
-    //                 toast.error('Erro ao gerar: Documento não encontrado.')
-    //             }
-    //         }
-    //     },
-    //     onBeforePrint: async () => {
-    //         actualThemeMode = theme ? theme : ''
-    //         if (theme === 'dark') {
-    //             setTheme('light')
-    //         }
-    //         toast.success('Gerando documento...')
-    //     },
-    //     onAfterPrint: () => {
-    //         if (actualThemeMode !== '') {
-    //             setTheme(actualThemeMode)
-    //         }
-    //         toast.success('Ordem gerada com sucesso!')
-    //     },
-    //     onPrintError: (location, error) => {
-    //         toast.error('Error in ' + location + ': ' + error)
-    //     }
-    // })
+    })
 
     return (
         <>
@@ -143,7 +133,7 @@ export default function PrintPurchasePage() {
                             className={`bg-green-600 text-white hover:bg-green-700 w-14 sm:w-36`}
                             onClick={() => handlePrint()}
                         >
-                            <Printer className="w-5 h-5" />
+                            <File className="w-5 h-5" />
                             <span className="hidden sm:block ml-2">Salvar</span>
                         </Button>
                     </div>
