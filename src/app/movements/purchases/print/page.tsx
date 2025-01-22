@@ -1,33 +1,95 @@
 "use client"
 
-import { useRef } from "react"
-import { useTheme } from "next-themes"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { File, X } from "lucide-react"
-import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { usePurchase } from "@/contexts/PurchaseContext"
-import {
-    Table,
-    TableCaption,
-    TableHeader,
-    TableHead,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableRow,
-} from "@/components/ui/table"
 import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
-import { useReactToPrint } from "react-to-print"
-// import html2pdf from 'js-html2pdf'
+import { Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer'
+
+const styles = StyleSheet.create({
+    page: {
+        backgroundColor: '#E4E4E4',
+        padding: 20,
+    },
+    counter: {
+        position: 'absolute',
+        bottom: 6,
+        right: 6,
+        fontSize: 10,
+    },
+    border: {
+        borderBottomWidth: 1,
+        borderColor: '#B4B4B4',
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    headerCompany: {
+        fontSize: 20,
+        color: '#303030',
+    },
+    headerAddress: {
+        fontSize: 14,
+        color: '#444444',
+    },
+    headerPhone: {
+        fontSize: 14,
+        color: '#444444',
+    },
+    headerTitle: {
+        fontSize: 12,
+        color: '#444444',
+    },
+    headerText: {
+        fontSize: 18,
+        color: 'var(--foreground)'
+    },
+    content: {
+        paddingVertical: 20,
+    },
+    contentHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    contentHeaderTitle: {
+        fontSize: 12,
+        color: '#444444',
+    },
+    contentHeaderText: {
+        fontSize: 12,
+        color: '#444444',
+    },
+    contentItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    contentItemText: {
+        fontSize: 16,
+        color: '#444444',
+    },
+    contentFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    contentFooterText: {
+        fontSize: 16,
+        color: '#444444',
+    },
+})
 
 export default function PrintPurchasePage() {
     const { back } = useRouter()
-    const { theme, setTheme } = useTheme()
+    // const { theme, setTheme } = useTheme()
 
     const { companySelected } = useUser()
 
@@ -38,216 +100,106 @@ export default function PrintPurchasePage() {
         clearPurchase
     } = usePurchase()
 
-    // useEffect(() => {
-    //     if (typeof window !== "undefined") {
-    //         const print = document.getElementById('print')
-    //         if (print) {
-    //             const options = {
-    //                 margin: 0,
-    //                 filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-    //             }
-    //             const exporter = html2pdf(print, options)
-    //             exporter.getPdf(options)
-    //         }
-    //     }
-    // }, [])
-
-    let actualThemeMode: string = ''
-
-    const printRef = useRef(null)
-    const handlePrint = useReactToPrint({
-        contentRef: printRef,
-        documentTitle: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-        // print: async (printIFrame) => {
-        //     if (typeof window !== "undefined") {
-        //         const document = printIFrame.contentDocument
-
-        //         if (document) {
-        //             const print = document
-        //             const options = {
-        //                 margin: 0,
-        //                 filename: companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6),
-        //                 image: { type: 'jpeg', quality: 0.98 },
-        //                 html2canvas:  {
-        //                     scale: 1,
-        //                     logging: true,
-        //                     dpi: 192,
-        //                     letterRendering: true,
-        //                 },
-        //                 jsPDF: {
-        //                     orientation: 'portrait',
-        //                     unit: 'mm',
-        //                     format: [210, 297],
-        //                 },
-        //             }
-
-        //             const exporter = html2pdf(print, options)
-        //             await exporter.getPdf(options)
-        //         } else {
-        //             toast.error('Erro ao gerar: Documento não encontrado.')
-        //         }
-        //     }
-        // },
-        onBeforePrint: async () => {
-            actualThemeMode = theme ? theme : ''
-            if (theme === 'dark') {
-                setTheme('light')
-            }
-            toast.success('Gerando documento...')
-        },
-        onAfterPrint: () => {
-            if (actualThemeMode !== '') {
-                setTheme(actualThemeMode)
-            }
-            toast.success('Ordem gerada com sucesso!')
-        },
-        onPrintError: (location, error) => {
-            toast.error('Error in ' + location + ': ' + error)
-        }
-    })
-
     return (
         <>
-            <div className="pt-4 pl-4 pr-4 sm:pt-6 sm:pl-6 sm:pr-6 bg-background h-full">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-xl sm:text-lg">
-                        {currentPage === 'order' ? 'Salvar Ordem' : 'Salvar Orçamento'}
-                    </h1>
-                    
-                    <div className="flex items-center justify-center gap-4">
-                        <Button
-                            disabled={isLoading}
-                            type="button"
-                            className={`bg-destructive text-destructive-foreground hover:bg-destructive/80 w-14 sm:w-32`}
-                            onClick={() => {
-                                clearPurchase()
-                                back()
-                            }}
+            {   isLoading ?
+                    <Loader />
+                :
+                currentPurchase.items.length === 0 ?
+                    <NotFound
+                        title='Nenhum item encontrado.'
+                    />
+                :
+                    <PDFViewer className="mt-4 mx-4 w-full h-screen">
+                        <Document
+                            title={companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6)}
+                            author={companySelected?.fantasy ? companySelected?.fantasy : companySelected?.name}
+                            creator="4easy - SISV"
+                            subject={currentPage === 'order' ? `Ordem de Compra ${formatZero(currentPurchase.sequence, 6)}` : `Orçamento de Compra ${formatZero(currentPurchase.sequence, 6)}`}
                         >
-                            <X className="w-5 h-5" />
-                            <span className="hidden sm:block ml-2">Fechar</span>
-                        </Button>
-                        <Button 
-                            disabled={isLoading}
-                            type="button"
-                            className={`bg-green-600 text-white hover:bg-green-700 w-14 sm:w-36`}
-                            onClick={() => handlePrint()}
-                        >
-                            <File className="w-5 h-5" />
-                            <span className="hidden sm:block ml-2">Salvar</span>
-                        </Button>
-                    </div>
-                </div>
-            </div>
-            <div className="p-4 sm:p-6 bg-background h-full" ref={printRef} id="print">
-                <div className="flex flex-row justify-between">
-                    <h1 className="text-lg sm:text-xl font-bold">{companySelected?.fantasy ? companySelected?.fantasy : companySelected?.name}</h1>
-                    <h1 className="text-lg sm:text-xl font-bold">CNPJ: {companySelected?.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')}</h1>
-                </div>
-                <div className="flex flex-row justify-between mb-4">
-                    <h1 className="text-base sm:text-lg font-normal">{companySelected?.address} - {companySelected?.city} - {companySelected?.state}</h1>
-                    <h1 className="text-base sm:text-lg font-normal">Telefone: {companySelected?.phone}</h1>
-                </div>
-                <div className="w-full border-b border-border mb-4" />
-                <div className="flex flex-col lg:flex-row gap-6 items-start">
-                    <div className="w-full select-none">
-                        <label className="block text-sm font-medium cursor-not-allowed text-muted-foreground">N° da Ordem</label>
-                        <h1 className="text-xl sm:text-lg mt-1">{formatZero(currentPurchase.sequence, 6)}</h1>
-                    </div>
-                    <div className="w-full select-none">
-                        <label className="block text-sm font-medium  text-muted-foreground">Data</label>
-                        <div
-                            className={cn(
-                                "flex flex-row justify-start items-center text-left font-normal w-full mt-1",
-                                !currentPurchase.date && "text-muted-foreground"
-                            )}
-                        >
-                            <h1 className="text-lg">{currentPurchase.date ? new Date(currentPurchase.date).toLocaleDateString('pt-BR') : <span>Nenhuma data selecionada</span>}</h1>
-                        </div>
-                    </div>
-                    <div className="w-full select-none">
-                        <label className="block text-sm font-medium text-muted-foreground">Previsão</label>
-                        <div
-                            className={cn(
-                                "flex flex-row justify-start items-center text-left font-normal w-full mt-1",
-                                !currentPurchase.delivery_date && "text-muted-foreground"
-                            )}
-                        >
-                            <h1 className="text-lg">{currentPurchase.delivery_date ? new Date(currentPurchase.delivery_date).toLocaleDateString('pt-BR') : <span>Nenhuma previsão selecionada</span>}</h1>
-                        </div>
-                    </div>                            
-                    <div className="w-full select-none">
-                        <label className="block text-sm font-medium  text-muted-foreground">Setor</label>
-                        <h1 className="text-xl sm:text-lg mt-1">{currentPurchase.department || 'Nenhum setor selecionado'}</h1>
-                    </div>
-                    <div className="w-full select-none">
-                        <label className="block text-sm font-medium  text-muted-foreground">Fornecedor</label>
-                        <h1 className="text-xl sm:text-lg mt-1">{currentPurchase.supplier || 'Nenhum fornecedor selecionado'}</h1>
-                    </div>
-                </div>
-
-                <div className="mt-6">
-                    {   isLoading ?
-                            <Loader />
-                        :
-                        currentPurchase.items.length === 0 ?
-                            <NotFound
-                                title='Nenhum item encontrado.'
-                            />
-                        :
-                            <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
-                                <TableCaption className="select-none">Itens da sua ordem de compra.</TableCaption>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead hidden className="sm:w-[120px] select-none text-muted-foreground">ID</TableHead>
-                                        <TableHead className="select-none text-muted-foreground">Produto</TableHead>
-                                        <TableHead className="w-[80px] sm:w-[120px] text-center select-none text-muted-foreground">Quant.</TableHead>
-                                        <TableHead className="w-[100px] sm:w-[150px] text-center select-none text-muted-foreground">V. Unit.</TableHead>
-                                        <TableHead className="w-[100px] sm:w-[150px] text-right select-none text-muted-foreground">Total</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
+                            <Page size="A4" orientation="landscape" style={styles.page}>
+                                <View style={[styles.header, { marginBottom: 5 }]}>
+                                    <Text style={styles.headerCompany}>{companySelected?.fantasy ? companySelected?.fantasy : companySelected?.name}</Text>
+                                    <Text style={styles.headerCompany}>CNPJ: {companySelected?.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')}</Text>
+                                </View>
+                                <View style={styles.header}>
+                                    <Text style={styles.headerAddress}>{companySelected?.address} - {companySelected?.city} - {companySelected?.state}</Text>
+                                    <Text style={styles.headerPhone}>Telefone: {companySelected?.phone}</Text>
+                                </View>
+                                <View style={[styles.header, { marginTop: 20 }]}>
+                                    <View>
+                                        <Text style={styles.headerTitle}>N° {currentPage === 'order' ? 'da Ordem' : 'do Orçamento'}</Text>
+                                        <Text style={styles.headerText}>{formatZero(currentPurchase.sequence, 6)}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.headerTitle}>Data</Text>
+                                        <Text style={styles.headerText}>{currentPurchase.date ? new Date(currentPurchase.date).toLocaleDateString('pt-BR') : <span>Nenhuma data selecionada</span>}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.headerTitle}>Previsão</Text>
+                                        <Text style={styles.headerText}>{currentPurchase.delivery_date ? new Date(currentPurchase.delivery_date).toLocaleDateString('pt-BR') : <span>Nenhuma previsão selecionada</span>}</Text>
+                                    </View>                            
+                                    <View>
+                                        <Text style={styles.headerTitle}>Setor</Text>
+                                        <Text style={styles.headerText}>{currentPurchase.department || 'Nenhum setor selecionado'}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.headerTitle}>Fornecedor</Text>
+                                        <Text style={styles.headerText}>{currentPurchase.supplier || 'Nenhum fornecedor selecionado'}</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.contentHeader}>
+                                    <Text style={[styles.contentHeaderTitle, { width: '60%' }]}>Itens</Text>
+                                    <Text style={[styles.contentHeaderTitle, { width: '13%', textAlign: 'center' }]}>Quant.</Text>
+                                    <Text style={[styles.contentHeaderTitle, { width: '13%', textAlign: 'center' }]}>V. Unit.</Text>
+                                    <Text style={[styles.contentHeaderTitle, { width: '14%', textAlign: 'right' }]}>Total</Text>
+                                </View>
+                                <View style={styles.border} />
+                                <View style={styles.content}>
                                     {   currentPurchase.items.length > 0 &&
                                         currentPurchase.items.map((item) => {
                                             return (
-                                                <TableRow key={item.id} className="h-[120px] sm:h-[80px] border-b hover:bg-gray-50 hover:dark:bg-gray-800">
-                                                    <TableCell hidden className="sm:w-[120px] select-none">{item.id}</TableCell>
-                                                    <TableCell className="select-none text-sm sm:text-base">{item.product}</TableCell>
-                                                    <TableCell className="w-[80px] sm:w-[120px] text-center select-none text-sm sm:text-base">{item.quantity}</TableCell>
-                                                    <TableCell className="w-[100px] sm:w-[150px] text-center select-none text-sm sm:text-base">
+                                                <View key={item.id} style={styles.contentItem}>
+                                                    <Text style={[styles.contentItemText, { width: '60%' }]}>{item.product}</Text>
+                                                    <Text style={[styles.contentItemText, { width: '13%', textAlign: 'center' }]}>{item.quantity}</Text>
+                                                    <Text style={[styles.contentItemText, { width: '13%', textAlign: 'center' }]}>
                                                         {Intl.NumberFormat('pt-BR', {
                                                             style: 'currency',
                                                             currency: 'BRL',
                                                         }).format(item.unitPrice)}
-                                                    </TableCell>
-                                                    <TableCell className="w-[100px] sm:w-[150px] text-right select-none text-sm sm:text-base">
+                                                    </Text>
+                                                    <Text style={[styles.contentItemText, { width: '14%', textAlign: 'right' }]}>
                                                         {Intl.NumberFormat('pt-BR', {
                                                             style: 'currency',
                                                             currency: 'BRL',
                                                         }).format(item.total)}
-                                                    </TableCell>
-                                                </TableRow>
+                                                    </Text>
+                                                </View>
                                             )
                                         })
                                     }
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell colSpan={3} className="select-none text-base font-bold">Total</TableCell>
-                                        <TableCell className="w-[100px] sm:w-[150px] text-right select-none text-base font-bold">
-                                            {Intl.NumberFormat('pt-BR', {
-                                                style: 'currency',
-                                                currency: 'BRL',
-                                            }).format(currentPurchase.items.reduce((total, purchaseItem) => {
-                                                return total + (purchaseItem.total || 0)
-                                            }, 0))}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
-                    }
-                </div>
-            </div>
+                                </View>
+                                <View style={styles.border} />
+                                <View style={styles.contentFooter}>
+                                    <Text style={styles.contentFooterText}>Total</Text>
+                                    <Text style={styles.contentFooterText}>
+                                        {Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(currentPurchase.items.reduce((total, purchaseItem) => {
+                                            return total + (purchaseItem.total || 0)
+                                        }, 0))}
+                                    </Text>
+                                </View>
+                                <View style={styles.counter}>
+                                    <Text render={({ pageNumber, totalPages }) => (
+                                        `${pageNumber} / ${totalPages}`
+                                    )} fixed />
+                                </View>
+                            </Page>
+                        </Document>
+                    </PDFViewer>
+            }
         </>
     );
 }
