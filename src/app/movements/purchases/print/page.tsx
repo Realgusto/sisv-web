@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     },
     border: {
         borderBottomWidth: 1,
-        borderColor: '#B4B4B4',
+        borderColor: '#c2c2c2',
         marginTop: 10,
         marginBottom: 10,
     },
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     },
     headerCompany: {
         fontSize: 20,
-        color: '#303030',
+        color: '#000000',
         fontFamily: 'Quicksand',
     },
     headerAddress: {
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 18,
-        color: 'var(--foreground)',
+        color: '#000000',
         fontFamily: 'Quicksand',
     },
     content: {
@@ -74,11 +74,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     contentHeaderTitle: {
-        fontSize: 12,
-        color: '#444444',
-        fontFamily: 'Quicksand',
-    },
-    contentHeaderText: {
         fontSize: 12,
         color: '#444444',
         fontFamily: 'Quicksand',
@@ -100,7 +95,7 @@ const styles = StyleSheet.create({
     },
     contentFooterText: {
         fontSize: 16,
-        color: '#444444',
+        color: '#000000',
         fontFamily: 'Quicksand',
     },
 })
