@@ -102,8 +102,6 @@ const styles = StyleSheet.create({
 
 export default function PrintPurchasePage() {
     const { back } = useRouter()
-    // const { theme, setTheme } = useTheme()
-
     const { companySelected } = useUser()
 
     const {
