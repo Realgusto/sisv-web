@@ -62,8 +62,13 @@ export default function Order() {
     const [currentOrder, setCurrentOrder] = useState<Purchase | null>(null)
 
     const handleAutorize = (order: Purchase) => {
+        if (!user || !user.admin) {
+            toast.error('Usuário não encontrado')
+            return
+        }
+
         setMode('edit')
-        setPurchase({...order, status: Status.Autorizada, items: []})
+        setPurchase({...order, status: Status.Autorizada, approval_user_id: user.id, items: []})
         setPage('order')
         push('/movements/purchases/new')
     }
@@ -81,6 +86,7 @@ export default function Order() {
                 date: new Date(),
                 delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
                 user_id: user ? user.id : '',
+                approval_user_id: null,
                 supplier: '',
                 total_value: 0,
                 status: Status.Recebida,

@@ -73,6 +73,7 @@ export default function Budget() {
                 date: new Date(),
                 delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
                 user_id: user ? user.id : '',
+                approval_user_id: null,
                 supplier: '',
                 total_value: 0,
                 status: Status.Aberta,

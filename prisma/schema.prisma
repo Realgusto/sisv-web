@@ -20,24 +20,27 @@ model User {
   purchases   Purchase[]    @relation("UserPurchases")
   UserCompany UserCompany[]
   Company     Company[]     @relation("UserCompanies")
+  Purchase    Purchase[]    @relation("ApprovalUserPurchases")
 }
 
 model Purchase {
-  id            String          @id @default(cuid())
-  sequence      Int             @default(autoincrement())
-  companyId     String
-  company       Company         @relation("Company", fields: [companyId], references: [id])
-  user_id       String
-  user          User            @relation("UserPurchases", fields: [user_id], references: [id])
-  date          DateTime
-  delivery_date DateTime
-  department    String?
-  supplier      String?
-  total_value   Float?
-  observations  String?
-  status        Status?
-  updated_at    DateTime?       @default(now()) @updatedAt
-  PurchaseItems PurchaseItems[]
+  id               String          @id @default(cuid())
+  sequence         Int             @default(autoincrement())
+  companyId        String
+  company          Company         @relation("Company", fields: [companyId], references: [id])
+  user_id          String
+  approval_user_id String?
+  user             User            @relation("UserPurchases", fields: [user_id], references: [id])
+  approval_user    User?           @relation("ApprovalUserPurchases", fields: [approval_user_id], references: [id])
+  date             DateTime
+  delivery_date    DateTime
+  department       String?
+  supplier         String?
+  total_value      Float?
+  observations     String?
+  status           Status?
+  updated_at       DateTime?       @default(now()) @updatedAt
+  PurchaseItems    PurchaseItems[]
 }
 
 model PurchaseItems {
@@ -54,9 +57,9 @@ model PurchaseItems {
 }
 
 model Overview {
-  id                String  @id
+  id                String   @id
   companyId         String
-  company           Company @relation("Company", fields: [companyId], references: [id])
+  company           Company  @relation("Company", fields: [companyId], references: [id])
   salesMonthly      Float
   averageTicket     Float
   salesLastYear     Json[]
@@ -65,8 +68,9 @@ model Overview {
   inactiveCustomers Int
   expenses          Float
   shopping          Float
-  payment           Float   @default(0)
-  receipt           Float   @default(0)
+  payment           Float    @default(0)
+  receipt           Float    @default(0)
+  updated_at        DateTime @default(now()) @updatedAt
 }
 
 model Company {
