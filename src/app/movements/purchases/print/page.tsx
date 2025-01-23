@@ -1,5 +1,6 @@
 "use client"
 
+import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { usePurchase } from "@/contexts/PurchaseContext"
 import NotFound from "@/components/NotFound"
@@ -22,6 +23,12 @@ export default function PrintPurchasePage() {
         clearPurchase
     } = usePurchase()
 
+    useCallback(() => {
+        if (!currentPurchase || currentPurchase.items.length === 0) {
+            back()
+        }
+    }, [currentPurchase])
+
     const handleBack = () => {
         back()
         clearPurchase()
@@ -29,7 +36,7 @@ export default function PrintPurchasePage() {
 
     return (
         <>
-            <div className="p-4 sm:p-6 flex items-center">
+            <div className="p-2 sm:p-4 flex items-center">
                 <Button className="bg-primary text-white w-10 sm:w-36 hover:bg-primary/80" onClick={handleBack}>
                     <ArrowLeft className="h-5 w-5" />
                     <span className="hidden sm:block ml-2">Voltar</span>
@@ -126,7 +133,7 @@ export default function PrintPurchasePage() {
                                 </View>
                                 <View style={styles.counter}>
                                     <Text render={({ pageNumber, totalPages }) => (
-                                        `${pageNumber} / ${totalPages}`
+                                        `Pág. ${pageNumber} / ${totalPages}`
                                     )} fixed />
                                 </View>
                             </Page>

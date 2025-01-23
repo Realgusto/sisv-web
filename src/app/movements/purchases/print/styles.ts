@@ -10,7 +10,7 @@ Font.register({
 export default StyleSheet.create({
     page: {
         backgroundColor: '#FFFFFF',
-        padding: 20,
+        padding: 12,
     },
     counter: {
         marginTop: 20,
