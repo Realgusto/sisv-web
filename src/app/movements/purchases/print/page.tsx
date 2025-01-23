@@ -6,99 +6,10 @@ import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
-import { Document, Page, Text, View, StyleSheet, PDFViewer, Font } from '@react-pdf/renderer'
+import { Document, Page, Text, View, PDFViewer } from '@react-pdf/renderer'
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
-
-Font.register({
-    family: 'Quicksand',
-    src: 'Quicksand-Regular'
-})
-
-const styles = StyleSheet.create({
-    page: {
-        backgroundColor: '#FFFFFF',
-        padding: 20,
-    },
-    counter: {
-        position: 'absolute',
-        bottom: 12,
-        right: 12,
-        fontSize: 10,
-        fontFamily: 'Quicksand',
-    },
-    border: {
-        borderBottomWidth: 1,
-        borderColor: '#c2c2c2',
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        fontFamily: 'Quicksand',
-    },
-    headerCompany: {
-        fontSize: 20,
-        color: '#000000',
-        fontFamily: 'Quicksand',
-    },
-    headerAddress: {
-        fontSize: 14,
-        color: '#444444',
-        fontFamily: 'Quicksand',
-    },
-    headerPhone: {
-        fontSize: 14,
-        color: '#444444',
-        fontFamily: 'Quicksand',
-    },
-    headerTitle: {
-        fontSize: 12,
-        color: '#444444',
-        fontFamily: 'Quicksand',
-    },
-    headerText: {
-        fontSize: 18,
-        color: '#000000',
-        fontFamily: 'Quicksand',
-    },
-    content: {
-        paddingVertical: 20,
-    },
-    contentHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    contentHeaderTitle: {
-        fontSize: 12,
-        color: '#444444',
-        fontFamily: 'Quicksand',
-    },
-    contentItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    contentItemText: {
-        fontSize: 16,
-        color: '#444444',
-        fontFamily: 'Quicksand',
-    },
-    contentFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    contentFooterText: {
-        fontSize: 16,
-        color: '#000000',
-        fontFamily: 'Quicksand',
-    },
-})
+import styles from "./styles"
 
 export default function PrintPurchasePage() {
     const { back } = useRouter()

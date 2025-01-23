@@ -139,24 +139,29 @@ export default function Budget() {
     useEffect(() => {
         const fetchOrders = async () => {
             setIsLoading(true)
-            try {
-                const response = await FetchAPI({
-                    URL: '/api/purchases?page=budget&companyId=' + companySelected?.id,
-                    method: 'GET'
-                })
+            if (companySelected?.id) {
+                try {
+                    const response = await FetchAPI({
+                        URL: '/api/purchases?page=budget&companyId=' + companySelected.id,
+                        method: 'GET'
+                    })
 
-                if ((response.status !== 200) && (response.status !== 404)) {
-                    throw new Error('Erro ao buscar orçamentos: ' + response.statusText)
-                } else if (response.status === 404) {
-                    toast.error('Nenhum orçamento encontrado')
-                    setOrders([])
-                } else {
-                    const data = await response.json()
-                    setOrders(data)
+                    if ((response.status !== 200) && (response.status !== 404)) {
+                        throw new Error('Erro ao buscar orçamentos: ' + response.statusText)
+                    } else if (response.status === 404) {
+                        toast.error('Nenhum orçamento encontrado')
+                        setOrders([])
+                    } else {
+                        const data = await response.json()
+                        setOrders(data)
+                    }
+                } catch (error) {
+                    console.error(error)
+                } finally {
+                    setIsLoading(false)
                 }
-            } catch (error) {
-                console.error(error)
-            } finally {
+            } else {
+                setOrders([])
                 setIsLoading(false)
             }
         }

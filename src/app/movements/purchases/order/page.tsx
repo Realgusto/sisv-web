@@ -153,24 +153,29 @@ export default function Order() {
     useEffect(() => {
         const fetchOrders = async () => {
             setIsLoading(true)
-            try {
-                const response = await FetchAPI({
-                    URL: '/api/purchases?page=order&companyId=' + companySelected?.id,
-                    method: 'GET'
-                })
+            if (companySelected?.id) {
+                try {
+                    const response = await FetchAPI({
+                        URL: '/api/purchases?page=order&companyId=' + companySelected.id,
+                        method: 'GET'
+                    })
 
-                if ((response.status !== 200) && (response.status !== 404)) {
-                    throw new Error('Erro ao buscar ordens: ' + response.statusText)
-                } else if (response.status === 404) {
-                    toast.error('Nenhuma ordem encontrada')
-                    setOrders([])
-                } else {
-                    const data = await response.json()
-                    setOrders(data)
+                    if ((response.status !== 200) && (response.status !== 404)) {
+                        throw new Error('Erro ao buscar ordens: ' + response.statusText)
+                    } else if (response.status === 404) {
+                        toast.error('Nenhuma ordem encontrada')
+                        setOrders([])
+                    } else {
+                        const data = await response.json()
+                        setOrders(data)
+                    }
+                } catch (error) {
+                    console.error(error)
+                } finally {
+                    setIsLoading(false)
                 }
-            } catch (error) {
-                console.error(error)
-            } finally {
+            } else {
+                setOrders([])
                 setIsLoading(false)
             }
         }
