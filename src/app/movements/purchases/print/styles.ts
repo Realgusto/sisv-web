@@ -4,7 +4,7 @@ Font.register({
     family: 'Rubik',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    src: 'http://fonts.gstatic.com/s/rubik/v4/2AfMVb-218AAzRWsLqegwg.ttf',
+    src: 'https://fonts.gstatic.com/s/rubik/v4/2AfMVb-218AAzRWsLqegwg.ttf',
 })
 
 export default StyleSheet.create({
