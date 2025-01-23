@@ -6,14 +6,14 @@ import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { useUser } from "@/contexts/UserContext"
-import { Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, PDFViewer, Font } from '@react-pdf/renderer'
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
-// Font.register({
-//     family: 'Quicksand',
-//     src: 'http://fonts.gstatic.com/s/quicksand/v6/sKd0EMYPAh5PYCRKSryvW6CWcynf_cDxXwCLxiixG1c.ttf'
-// })
+Font.register({
+    family: 'Quicksand',
+    src: 'Quicksand-Regular'
+})
 
 const styles = StyleSheet.create({
     page: {
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
         bottom: 12,
         right: 12,
         fontSize: 10,
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     border: {
         borderBottomWidth: 1,
@@ -37,32 +37,32 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     headerCompany: {
         fontSize: 20,
         color: '#000000',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     headerAddress: {
         fontSize: 14,
         color: '#444444',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     headerPhone: {
         fontSize: 14,
         color: '#444444',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     headerTitle: {
         fontSize: 12,
         color: '#444444',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     headerText: {
         fontSize: 18,
         color: '#000000',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     content: {
         paddingVertical: 20,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     contentHeaderTitle: {
         fontSize: 12,
         color: '#444444',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     contentItem: {
         flexDirection: 'row',
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     contentItemText: {
         fontSize: 16,
         color: '#444444',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
     contentFooter: {
         flexDirection: 'row',
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     contentFooterText: {
         fontSize: 16,
         color: '#000000',
-        // fontFamily: 'Quicksand',
+        fontFamily: 'Quicksand',
     },
 })
 
