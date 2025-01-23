@@ -13,9 +13,9 @@ export default StyleSheet.create({
         padding: 20,
     },
     counter: {
-        position: 'absolute',
-        bottom: 12,
-        right: 12,
+        marginTop: 20,
+        textAlign: 'right',
+        width: '100%',
         fontSize: 10,
         fontFamily: 'Rubik',
     },
@@ -32,7 +32,7 @@ export default StyleSheet.create({
         fontFamily: 'Rubik',
     },
     headerCompany: {
-        fontSize: 20,
+        fontSize: 18,
         color: '#000000',
         fontFamily: 'Rubik',
     },
@@ -52,7 +52,7 @@ export default StyleSheet.create({
         fontFamily: 'Rubik',
     },
     headerText: {
-        fontSize: 18,
+        fontSize: 16,
         color: '#000000',
         fontFamily: 'Rubik',
     },
