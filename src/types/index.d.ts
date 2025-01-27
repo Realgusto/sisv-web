@@ -21,6 +21,7 @@ interface MetricsType {
     shopping: number;
     receipt: number;
     payment: number;
+    updated_at: DateTime | null;
 }
 
 interface bestSeller {

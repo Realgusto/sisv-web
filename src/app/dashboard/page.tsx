@@ -7,9 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SalesChart } from '@/components/SalesChart'
 import { TopProductsChart } from '@/components/TopProductsChart'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
 import { useUser } from '@/contexts/UserContext'
+import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import moment from 'moment'
+import 'moment/locale/pt-br'
 import { useRouter } from 'next/navigation'
 import Loader from '@/components/ui/loader'
 import FetchAPI from '@/utils/fetch-api'
@@ -56,7 +58,8 @@ export default function Dashboard() {
           expenses: 0,
           shopping: 0,
           receipt: 0,
-          payment: 0
+          payment: 0,
+          updated_at: null
         })
       } else {
         const metrics: MetricsType = await response.json()
@@ -88,10 +91,14 @@ export default function Dashboard() {
             fill: 'hsl(var(--chart-'+(index+1)+'))'
           }
         }))
+
+        toast.success('Dados de: ' + moment(new Date(metrics.updated_at)).calendar(), {
+          duration: 10000,
+        })
       }
     };
     fetchData()
-  }, [companySelected, push])
+  }, []) //
 
   if (!overview) {
     return (

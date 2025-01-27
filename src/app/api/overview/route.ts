@@ -107,6 +107,7 @@ export async function PUT(request: Request) {
                 shopping: data.shopping,
                 receipt: data.receipt, 
                 payment: data.payment,
+                updated_at: new Date()
             },
         });
         return NextResponse.json(updatedOverview);

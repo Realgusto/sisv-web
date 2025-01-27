@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import {
-    Status,
+    StatusPurchase,
     PrismaClient,
     Purchase,
     PurchaseItems
@@ -25,14 +25,14 @@ export async function GET(request: Request) {
             purchases = await prisma.purchase.findMany({
                 where: {
                     companyId: companyId,
-                    status: { notIn: [ Status.Aberta, Status.Cancelada ]}
+                    status: { notIn: [ StatusPurchase.Aberta, StatusPurchase.Cancelada ]}
                 }
             })
         } else if (page === 'budget') {
             purchases = await prisma.purchase.findMany({
                 where: {
                     companyId: companyId,
-                    status: Status.Aberta
+                    status: StatusPurchase.Aberta
                 }
             })
         } else {
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
                 supplier: data.supplier,
                 total_value: data.total_value,
                 delivery_date: data.delivery_date,
-                status: data.status || Status.Aberta,
+                status: data.status || StatusPurchase.Aberta,
                 department: data.department,
                 observations: data.observations
             },
@@ -152,7 +152,7 @@ export async function DELETE(request: Request) {
                 companyId: companyId
             },
             data: {
-                status: Status.Cancelada
+                status: StatusPurchase.Cancelada
             }
         });
 

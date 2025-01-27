@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
-import { Purchase, PurchaseItems, Status } from '@prisma/client'
+import { Purchase, PurchaseItems, StatusPurchase } from '@prisma/client'
 import FetchAPI from '@/utils/fetch-api'
 
 interface PurchaseContextType {
@@ -54,7 +54,7 @@ export const PurchaseProvider = ({ children }: { children: ReactNode }) => {
     date: new Date(),
     delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
     supplier: '',
-    status: Status.Aberta,
+    status: StatusPurchase.Aberta,
     department: '',
     items: [],
     total_value: 0,
@@ -94,7 +94,7 @@ export const PurchaseProvider = ({ children }: { children: ReactNode }) => {
       date: new Date(),
       delivery_date: new Date(new Date().setDate(new Date().getDate() + 1)),
       supplier: '',
-      status: Status.Aberta,
+      status: StatusPurchase.Aberta,
       department: '',
       items: [],
       total_value: 0,

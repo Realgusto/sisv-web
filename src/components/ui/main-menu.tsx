@@ -94,12 +94,7 @@ const MainMenu = () => {
                     </MenubarSubTrigger>
                     <MenubarSubContent>
                       <MenubarItem onClick={() => {
-                        // push('/movements/services/budget')
-                      }}>
-                        <ClipboardIcon className="mr-3" size={16}/> Orçamentos
-                      </MenubarItem>
-                      <MenubarItem onClick={() => {
-                        // push('/movements/services/order')
+                        push('/movements/services/order')
                       }}>
                         <ClipboardIcon className="mr-3" size={16}/> Ordem de serviço
                       </MenubarItem>
@@ -248,6 +243,19 @@ const MainMenu = () => {
                             push('/movements/purchases/order')
                           }}>
                             <ClipboardIcon className="mr-3" size={16}/> Ordem de compra
+                          </MenubarItem>
+                        </MenubarSubContent>
+                      </MenubarSub>
+                      <MenubarSeparator />
+                      <MenubarSub>
+                        <MenubarSubTrigger>
+                          <FileTextIcon className="mr-3" size={16}/> Serviços
+                        </MenubarSubTrigger>
+                        <MenubarSubContent>
+                          <MenubarItem onClick={() => {
+                            push('/movements/services/order')
+                          }}>
+                            <ClipboardIcon className="mr-3" size={16}/> Ordem de serviço
                           </MenubarItem>
                         </MenubarSubContent>
                       </MenubarSub>

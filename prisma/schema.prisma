@@ -10,17 +10,20 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(cuid())
-  name        String
-  email       String        @unique
-  password    String
-  admin       Boolean       @default(false)
-  active      Boolean       @default(true)
-  updated_at  DateTime      @default(now())
-  purchases   Purchase[]    @relation("UserPurchases")
-  UserCompany UserCompany[]
-  Company     Company[]     @relation("UserCompanies")
-  Purchase    Purchase[]    @relation("ApprovalUserPurchases")
+  id              String        @id @default(cuid())
+  name            String
+  email           String        @unique
+  password        String
+  admin           Boolean       @default(false)
+  active          Boolean       @default(true)
+  updated_at      DateTime      @default(now())
+  purchases       Purchase[]    @relation("UserPurchases")
+  UserCompany     UserCompany[]
+  Company         Company[]     @relation("UserCompanies")
+  Purchase        Purchase[]    @relation("ApprovalUserPurchases")
+  Service         Service[]     @relation("UserServices")
+  ServiceUser     Service[]     @relation("ServiceUser")
+  ApprovalService Service[]     @relation("ApprovalServiceUser")
 }
 
 model Purchase {
@@ -29,8 +32,8 @@ model Purchase {
   companyId        String
   company          Company         @relation("Company", fields: [companyId], references: [id])
   user_id          String
-  approval_user_id String?
   user             User            @relation("UserPurchases", fields: [user_id], references: [id])
+  approval_user_id String?
   approval_user    User?           @relation("ApprovalUserPurchases", fields: [approval_user_id], references: [id])
   date             DateTime
   delivery_date    DateTime
@@ -38,7 +41,7 @@ model Purchase {
   supplier         String?
   total_value      Float?
   observations     String?
-  status           Status?
+  status           StatusPurchase?
   updated_at       DateTime?       @default(now()) @updatedAt
   PurchaseItems    PurchaseItems[]
 }
@@ -89,6 +92,7 @@ model Company {
   User        User[]        @relation("UserCompanies")
   Overview    Overview[]    @relation("Company")
   Purchase    Purchase[]    @relation("Company")
+  Service     Service[]     @relation("Company")
 }
 
 model UserCompany {
@@ -100,7 +104,40 @@ model UserCompany {
   @@id([userId, companyId])
 }
 
-enum Status {
+model Service {
+  id                  String        @id @default(cuid())
+  sequence            Int           @default(autoincrement())
+  companyId           String
+  company             Company       @relation("Company", fields: [companyId], references: [id])
+  user_id             String
+  user                User          @relation("UserServices", fields: [user_id], references: [id])
+  service_user_id     String?
+  service_user        User?         @relation("ServiceUser", fields: [service_user_id], references: [id])
+  approval_user_id    String?
+  approval_user       User?         @relation("ApprovalServiceUser", fields: [approval_user_id], references: [id])
+  date                DateTime      @default(now())
+  end_date            DateTime?
+  department          String?
+  equipment           String?
+  criticality         String?
+  service_type        String?
+  equipment_status    String?
+  service_description String?
+  observations        String?
+  status              StatusService
+  updated_at          DateTime      @default(now()) @updatedAt
+}
+
+enum StatusService {
+  Aberta
+  Programada
+  Em_andamento
+  Concluida
+  Concluida_parcialmente
+  Cancelada
+}
+
+enum StatusPurchase {
   Aberta
   Recebida
   Autorizada

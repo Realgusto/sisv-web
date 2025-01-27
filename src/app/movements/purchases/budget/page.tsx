@@ -31,7 +31,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Purchase, Status } from '@prisma/client'
+import { Purchase, StatusPurchase } from '@prisma/client'
 import { useUser } from '@/contexts/UserContext'
 import FetchAPI from '@/utils/fetch-api'
 import NotFound from '@/components/NotFound'
@@ -42,7 +42,7 @@ import { formatZero } from '@/utils'
 
 export default function Budget() {
     const { push } = useRouter()
-    const { setPage, setMode, setPurchase } = usePurchase()
+    const { setPage, setMode, currentPurchase, setPurchase } = usePurchase()
     const { user, companySelected } = useUser()
 
 
@@ -51,11 +51,10 @@ export default function Budget() {
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [isDeleting, setIsDeleting] = useState(false)
-    const [currentOrder, setCurrentOrder] = useState<Purchase | null>(null)
 
     const handleChangeStatus = (order: Purchase) => {
         setMode('edit')
-        setPurchase({...order, status: Status.Recebida, items: []})
+        setPurchase({...order, status: StatusPurchase.Recebida, items: []})
         setPage('budget')
         push('/movements/purchases/new')
     }
@@ -76,7 +75,7 @@ export default function Budget() {
                 approval_user_id: null,
                 supplier: '',
                 total_value: 0,
-                status: Status.Aberta,
+                status: StatusPurchase.Aberta,
                 department: '',
                 observations: '',
                 updated_at: null,
@@ -95,7 +94,7 @@ export default function Budget() {
     }
 
     const handleOpenAlertDialog = (order: Purchase) => {
-        setCurrentOrder(order)
+        setPurchase({...order, items: []})
         setIsAlertDialogOpen(true)
     }
 
@@ -106,7 +105,7 @@ export default function Budget() {
                 URL: '/api/purchases',
                 method: 'DELETE',
                 body: JSON.stringify({
-                    id: currentOrder?.id,
+                    id: currentPurchase?.id,
                     companyId: companySelected ?
                                     companySelected.id
                                     :
@@ -272,7 +271,7 @@ export default function Budget() {
                                                         <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                                         <AlertDialogDescription>
                                                             Deseja cancelar o orçamento?                                                            
-                                                            { currentOrder?.supplier && <><br />Fornecedor: {currentOrder.supplier}</> }
+                                                            { currentPurchase?.supplier && <><br />Fornecedor: {currentPurchase.supplier}</> }
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
@@ -302,7 +301,7 @@ export default function Budget() {
                                         style: 'currency',
                                         currency: 'BRL',
                                     }).format(orders.reduce((total, order) => {
-                                        if (order.status === Status.Faturada || order.status?.startsWith('Pedido')) {
+                                        if (order.status === StatusPurchase.Faturada || order.status?.startsWith('Pedido')) {
                                             return total + (order.total_value || 0)
                                         }
                                         return total

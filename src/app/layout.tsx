@@ -9,6 +9,7 @@ import { UserProvider } from "@/contexts/UserContext"
 import MainMenu from "@/components/ui/main-menu"
 import { Toaster } from "@/components/ui/sonner"
 import { PurchaseProvider } from "@/contexts/PurchaseContext"
+import { ServiceProvider } from "@/contexts/ServiceContext"
 
 const mainFontFamily = Quicksand({
   variable: "--font-family-main",
@@ -49,8 +50,10 @@ export default function RootLayout({
         >
           <UserProvider>
             <PurchaseProvider>
-              <MainMenu />
-              {children}
+              <ServiceProvider>
+                <MainMenu />
+                {children}
+              </ServiceProvider>
             </PurchaseProvider>
           </UserProvider>
         </ThemeProvider>

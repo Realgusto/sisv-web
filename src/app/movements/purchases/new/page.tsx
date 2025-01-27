@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import { Combobox } from "@/components/ui/combobox"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
-import { Purchase, PurchaseItems, Status } from "@prisma/client"
+import { Purchase, PurchaseItems, StatusPurchase } from "@prisma/client"
 import { ptBR } from "date-fns/locale"
 import { CalendarIcon, Edit, MoreVertical,  PackageX, Plus, Save, X } from "lucide-react"
 import { useState } from "react"
@@ -53,6 +53,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
+import { itemsDepartment } from "@/constants"
 
 export default function NewPurchasePage() {
     const { back } = useRouter()
@@ -151,11 +152,12 @@ export default function NewPurchasePage() {
             sequence: currentPurchase.id !== '' ? currentPurchase.sequence : 0,
             companyId: companySelected ? companySelected.id : '',
             user_id: user ? user.id : '',
+            approval_user_id: null,
             date: currentPurchase.date ? currentPurchase.date : new Date(),
             delivery_date: currentPurchase.delivery_date,
             supplier: currentPurchase.supplier,
             total_value: totalValue,
-            status: currentPurchase.id !== '' ? currentPurchase.status : currentPage === 'order' ? Status.Recebida : Status.Aberta,
+            status: currentPurchase.id !== '' ? currentPurchase.status : currentPage === 'order' ? StatusPurchase.Recebida : StatusPurchase.Aberta,
             department: currentPurchase.department,
             observations: currentPurchase.observations,
             updated_at: new Date(),
@@ -326,13 +328,7 @@ export default function NewPurchasePage() {
                             defaultTitle='Selecione o setor...'
                             defaultComandEmpty='Nenhum setor encontrado.'
                             defaultComandPlaceHolder='Pesquise o setor...'
-                            items={[
-                                { value: 'Compras', label: 'Compras' },
-                                { value: 'Financeiro', label: 'Financeiro' },
-                                { value: 'RH', label: 'RH' },
-                                { value: 'TI', label: 'TI' },
-                                { value: 'Vendas', label: 'Vendas' }
-                            ]}
+                            items={itemsDepartment}
                             value={currentPurchase.department || ''}
                             className={cn("mt-1 w-full rounded-md shadow-sm p-2 min-w-36", isVisualize && 'cursor-not-allowed')}
                             disabled={isVisualize}
