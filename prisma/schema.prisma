@@ -60,7 +60,7 @@ model PurchaseItems {
 }
 
 model Overview {
-  id                String   @id
+  id                String
   companyId         String
   company           Company  @relation("Company", fields: [companyId], references: [id])
   salesMonthly      Float
@@ -74,6 +74,8 @@ model Overview {
   payment           Float    @default(0)
   receipt           Float    @default(0)
   updated_at        DateTime @default(now()) @updatedAt
+
+  @@id([id, companyId])
 }
 
 model Company {

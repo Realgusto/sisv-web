@@ -18,7 +18,7 @@ export default function Hoverable({ children, renderHoverContent, className }: H
         >
             {children}
             {isHovering && (
-                <div className={cn(className, "text-nowrap text-center absolute p-4 rounded-lg shadow-md transition-opacity duration-500 opacity-100")}>
+                <div className={cn(className, "text-nowrap text-center absolute p-4 rounded-lg shadow-md transition-opacity duration-500 opacity-100 bg-opacity-100")}>
                     {renderHoverContent()}
                 </div>
             )}

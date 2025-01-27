@@ -17,7 +17,10 @@ import {
     MoreVertical,
     PackageX,
     Plus,
-    X
+    X,
+    Check,
+    FileWarning,
+    OctagonAlert
 } from 'lucide-react'
 import {
     DropdownMenu,
@@ -45,6 +48,7 @@ import NotFound from '@/components/NotFound'
 import { useRouter } from 'next/navigation'
 import { useService } from '@/contexts/ServiceContext'
 import { formatZero } from '@/utils'
+import Hoverable from '@/components/Hoverable'
 
 export default function Services() {
     const { push } = useRouter()
@@ -253,7 +257,15 @@ export default function Services() {
                                     <TableCell className="w-[100px] sm:w-[120px] text-xs sm:text-base select-none">{service.department ? service.department : 'N . D'}</TableCell>
                                     <TableCell className="select-none text-xs sm:text-base">{service.equipment ? service.equipment : 'N . D'}</TableCell>
                                     <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{service.status ? service.status : 'N . D'}</TableCell>
-                                    <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">{service.criticality ? service.criticality : 'N . D'}</TableCell>
+                                    <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">
+                                        {service.criticality && service.criticality === 'high' ? 
+                                            <FileWarning className="h-8 w-8 ml-auto text-red-500" />
+                                        : service.criticality && service.criticality === 'medium' ?
+                                            <OctagonAlert className="h-8 w-8 ml-auto text-yellow-500" />
+                                        : service.criticality && service.criticality === 'low' &&
+                                            <Check className="h-8 w-8 ml-auto text-green-500" />
+                                        }
+                                    </TableCell>
                                     <TableCell className="w-[35px] sm:w-[50px] text-right select-none">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

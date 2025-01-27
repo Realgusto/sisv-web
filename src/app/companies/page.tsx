@@ -45,14 +45,26 @@ export default function Companies() {
                 {companies && companies.map((company) => (
                     <Card key={company.id} className={styleCard} onClick={() => clickCompany(company)}>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-lg font-bold">{company.fantasy ? company.fantasy : company.name}</CardTitle>
+                            <CardTitle className="text-xl sm:text-2xl font-bold">{company.fantasy ? company.fantasy : company.name}</CardTitle>
                             <ExternalLink className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             { 
                                 company.address && company.city && company.state &&
-                                <CardDescription className="text-sm text-muted-foreground">
+                                <CardDescription className="text-sm sm:text-base text-muted-foreground mb-1">
                                     Localizado em {company.address}, {company.city} - {company.state}
+                                </CardDescription>
+                            }
+                            {
+                                company.cnpj &&
+                                <CardDescription className="text-sm sm:text-base text-muted-foreground mb-1">
+                                    CNPJ: {company.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')}
+                                </CardDescription>
+                            }
+                            {
+                                company.phone &&
+                                <CardDescription className="text-sm sm:text-base text-muted-foreground mb-1">
+                                    Telefone: {company.phone}
                                 </CardDescription>
                             }
                         </CardContent>

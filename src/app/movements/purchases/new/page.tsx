@@ -138,18 +138,25 @@ export default function NewPurchasePage() {
 
         if (!currentPurchase) return
 
-        if (currentPurchase.supplier === null || currentPurchase.supplier === '' || currentPurchase.items.length === 0 || currentPurchase.department === null || currentPurchase.department === '') {
+        if (currentPurchase.items.length === 0 || currentPurchase.department === null || currentPurchase.department === '') {
             toast.error('Preencha todos os campos corretamente')
             setIsSubmitting(false)
             return
         }
 
+        if (currentPage === 'order' && (currentPurchase.supplier === null || currentPurchase.supplier === '')) {
+            toast.error('Preencha o campo fornecedor')
+            setIsSubmitting(false)
+            return
+        }
+
         const newOrderId = currentPurchase.id !== '' ? currentPurchase.id : uuidv4()
+        const newSequence = currentPurchase.id !== '' ? currentPurchase.sequence : 0
         const totalValue = currentPurchase.items.reduce((total, purchaseItem) => total + (purchaseItem.quantity * purchaseItem.unitPrice), 0)
 
         const newOrder: Purchase & { items: PurchaseItems[] } = {
             id: newOrderId,
-            sequence: currentPurchase.id !== '' ? currentPurchase.sequence : 0,
+            sequence: newSequence,
             companyId: companySelected ? companySelected.id : '',
             user_id: user ? user.id : '',
             approval_user_id: null,
@@ -182,15 +189,15 @@ export default function NewPurchasePage() {
             })
 
             if (!response.ok) {
-                throw new Error(`Erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'o orçamento'}: ${response.statusText}`)
+                throw new Error(`Erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'a requisição'}: ${response.statusText}`)
             } else {
-                toast.success(`${currentPage === 'order' ? 'Ordem salva' : 'Orçamento salvo'} com sucesso`)
+                toast.success(`${currentPage === 'order' ? 'Ordem salva' : 'Requisição salva'} com sucesso`)
                 clearPurchase()
                 back()
             }
         } catch (error) {
-            console.error(`Erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'o orçamento'}: ${error}`)
-            toast.error(`Ocorreu um erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'o orçamento'}: ${error}`)
+            console.error(`Erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'a requisição'}: ${error}`)
+            toast.error(`Ocorreu um erro ao salvar ${currentPage === 'order' ? 'a ordem' : 'a requisição'}: ${error}`)
         } finally {
             setIsSubmitting(false)
         }
@@ -203,10 +210,10 @@ export default function NewPurchasePage() {
                     <h1 className="text-2xl sm:text-lg">
                         {
                             isVisualize ?
-                                `Visualizar ${currentPage === 'order' ? 'Ordem' : 'Orçamento'}` : 
+                                `Visualizar ${currentPage === 'order' ? 'Ordem' : 'Requisição'}` : 
                             currentPurchase && currentPurchase.id !== '' ?
-                                `Editar ${currentPage === 'order' ? 'Ordem' : 'Orçamento'}` :
-                                `Adicionar ${currentPage === 'order' ? 'Ordem' : 'Orçamento'}`
+                                `Editar ${currentPage === 'order' ? 'Ordem' : 'Requisição'}` :
+                                `Adicionar ${currentPage === 'order' ? 'Ordem' : 'Requisição'}`
                         }
                     </h1>
 
@@ -251,7 +258,7 @@ export default function NewPurchasePage() {
             
                 <div className="flex flex-col lg:flex-row gap-6 items-start">
                     <div className="w-full">
-                        <label className="block text-sm font-medium cursor-not-allowed text-gray-700 dark:text-zinc-400">N° da Ordem</label>
+                        <label className="block text-sm font-medium cursor-not-allowed text-gray-700 dark:text-zinc-400">N° da {currentPage === 'order' ? 'Ordem' : 'Requisição'}</label>
                         <input 
                             type="text" 
                             value={String(formatZero(currentPurchase.sequence, 6)) || ''} 
@@ -341,17 +348,19 @@ export default function NewPurchasePage() {
                             }} 
                         />
                     </div>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Fornecedor</label>
-                        <input 
-                            type="text" 
-                            value={currentPurchase.supplier || ''} 
-                            onChange={(e) => setPurchase({ ...currentPurchase, supplier: e.target.value })} 
-                            className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", isVisualize && 'cursor-not-allowed')}
-                            required
-                            disabled={isVisualize}
-                        />
-                    </div>
+                    {
+                        currentPage === 'order' &&
+                        <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Fornecedor</label>
+                            <input 
+                                type="text" 
+                                value={currentPurchase.supplier || ''} 
+                                onChange={(e) => setPurchase({ ...currentPurchase, supplier: e.target.value })} 
+                                className={cn("mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary", isVisualize && 'cursor-not-allowed')}
+                                disabled={isVisualize}
+                            />
+                        </div>
+                    }
                     {/* <div className="min-w-44">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
                         <Textarea
@@ -389,7 +398,7 @@ export default function NewPurchasePage() {
                         />
                     :
                         <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
-                            <TableCaption className="select-none">Itens da sua ordem de compra.</TableCaption>
+                            <TableCaption className="select-none">Itens da sua {currentPage === 'order' ? 'ordem' : 'requisição'} de compra.</TableCaption>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead hidden className="sm:w-[120px] select-none">ID</TableHead>

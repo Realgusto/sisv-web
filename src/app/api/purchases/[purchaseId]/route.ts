@@ -36,8 +36,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ purc
 
         return NextResponse.json({ ...purchase, items }, { status: 200 })
     } catch (error) {
-        console.error('Erro ao buscar ordens: '+ error)
-        return NextResponse.json({ error: 'Erro ao buscar ordens: ' + error }, { status: 500 })
+        console.error('Erro ao buscar ordem: '+ error)
+        return NextResponse.json({ error: 'Erro ao buscar ordem: ' + error }, { status: 500 })
     } finally {
         await prisma.$disconnect();
     }

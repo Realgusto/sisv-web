@@ -141,11 +141,11 @@ export default function NewServicePage() {
         }
 
         const newServiceId = currentService.id !== '' ? currentService.id : uuidv4()
-        // const totalValue = currentService.items.reduce((total, purchaseItem) => total + (purchaseItem.quantity * purchaseItem.unitPrice), 0)
+        const newSequence = currentService.id !== '' ? currentService.sequence : 0
 
         const newService: Service = {
             id: newServiceId,
-            sequence: currentService.id !== '' ? currentService.sequence : 0,
+            sequence: newSequence,
             companyId: companySelected ? companySelected.id : '',
             user_id: user ? user.id : '',
             service_user_id: null,

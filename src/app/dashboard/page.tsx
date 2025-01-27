@@ -92,7 +92,7 @@ export default function Dashboard() {
           }
         }))
 
-        toast.success('Dados de: ' + moment(new Date(metrics.updated_at)).calendar(), {
+        toast.success(moment(new Date(metrics.updated_at)).calendar(), {
           duration: 10000,
         })
       }

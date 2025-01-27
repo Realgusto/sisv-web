@@ -25,6 +25,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
+    // console.log('password: ' + md5(password.toUpperCase()))
     try {
       const response = await FetchAPI({ 
         URL: '/api/users/login',

@@ -114,7 +114,7 @@ export default function Budget() {
             })
 
             if (!response.ok) {
-                throw new Error('Erro ao cancelar o orçamento: ' + response.statusText)
+                throw new Error('Erro ao cancelar a requisição: ' + response.statusText)
             }
 
             const data = await response.json()
@@ -130,7 +130,7 @@ export default function Budget() {
             setIsAlertDialogOpen(false)
         } catch (error) {
             console.error(error)
-            alert('Ocorreu um erro ao cancelar o orçamento. Tente novamente mais tarde: ' + error)
+            alert('Ocorreu um erro ao cancelar a requisição. Tente novamente mais tarde: ' + error)
         } finally {
             setIsDeleting(false)
         }
@@ -147,9 +147,9 @@ export default function Budget() {
                     })
 
                     if ((response.status !== 200) && (response.status !== 404)) {
-                        throw new Error('Erro ao buscar orçamentos: ' + response.statusText)
+                        throw new Error('Erro ao buscar requisições: ' + response.statusText)
                     } else if (response.status === 404) {
-                        toast.error('Nenhum orçamento encontrado')
+                        toast.error('Nenhuma requisição encontrada')
                         setOrders([])
                     } else {
                         const data = await response.json()
@@ -172,23 +172,23 @@ export default function Budget() {
     return (
         <div className="p-4 sm:p-6 bg-background min-h-screen h-full">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-bold select-none sm:text-lg">Orçamentos</h1>
+                <h1 className="text-xl font-bold select-none sm:text-lg">Requisições</h1>
                 <Button 
                     onClick={() => handleOpenDialog()} 
                     className="bg-primary text-white w-10 sm:w-36 hover:bg-primary/80"
                 >
                     <Plus className="h-5 w-5" />
-                    <span className="hidden sm:block ml-2">Orçamento</span>
+                    <span className="hidden sm:block ml-2">Requisição</span>
                 </Button>
             </div>
             {   orders.length === 0 && !isLoading ?
-                    <NotFound title='Nenhum orçamento encontrado. Para iniciar, clique no botão "Orçamento" acima, e crie um novo orçamento.' />
+                    <NotFound title='Nenhuma requisição encontrada. Para iniciar, clique no botão "Requisição" acima, e crie uma nova requisição.' />
                 :
                     <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
-                        <TableCaption className="select-none">Uma lista dos seus orçamentos.</TableCaption>
+                        <TableCaption className="select-none">Uma lista das suas requisições.</TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="sm:w-[120px] select-none"><span className="ml-2">O.C</span></TableHead>
+                                <TableHead className="sm:w-[120px] select-none"><span className="ml-2">R.C</span></TableHead>
                                 <TableHead className="w-[100px] sm:w-[120px] select-none">Data</TableHead>
                                 <TableHead className="w-[100px] sm:w-[120px] select-none">Setor</TableHead>
                                 <TableHead className="select-none">Fornecedor</TableHead>
@@ -252,7 +252,7 @@ export default function Budget() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent>
                                                     <DropdownMenuItem className="text-green-500 hover:text-green-600" onClick={() => {
-                                                        toast.info('Revise o orçamento e clique em "salvar" para criar uma ordem de compra.')
+                                                        toast.info('Revise a requisição e clique em "salvar" para criar uma ordem de compra.')
                                                         handleChangeStatus(order)
                                                     }}>
                                                         <ClipboardPenLine className="h-3 w-3 mr-2" /> Gerar Ordem
@@ -270,7 +270,7 @@ export default function Budget() {
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Deseja cancelar o orçamento?                                                            
+                                                            Deseja cancelar a requisição?                                                            
                                                             { currentPurchase?.supplier && <><br />Fornecedor: {currentPurchase.supplier}</> }
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>

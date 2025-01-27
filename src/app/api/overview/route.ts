@@ -19,8 +19,10 @@ export async function GET(request: Request) {
     try {
         const overview: Overview | null = await prisma.overview.findUnique({
             where: {
-                id: id,
-                companyId: companyId
+                id_companyId: {
+                    id: id,
+                    companyId: companyId
+                }
             }
         });
         
@@ -93,8 +95,10 @@ export async function PUT(request: Request) {
 
         const updatedOverview = await prisma.overview.update({
             where: {
-                id: id,
-                companyId: company.id
+                id_companyId: {
+                    id: id,
+                    companyId: company.id
+                }
             },
             data: {
                 salesMonthly: data.salesMonthly,
@@ -132,8 +136,10 @@ export async function DELETE(request: Request) {
 
         const overview = await prisma.overview.findUnique({
             where: {
-                id: id,
-                companyId: company.id
+                id_companyId: {
+                    id: id,
+                    companyId: company.id
+                }
             },
         });
 
@@ -143,8 +149,10 @@ export async function DELETE(request: Request) {
 
         await prisma.overview.delete({
             where: {
-                id: id,
-                companyId: company.id
+                id_companyId: {
+                    id: id,
+                    companyId: company.id
+                }
             },
         });
         return NextResponse.json({ id: id, message: 'Métricas deletadas com sucesso' });
