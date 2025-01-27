@@ -57,7 +57,6 @@ export default function NewServicePage() {
     const { back } = useRouter()
 
     const {
-        isLoading,
         currentMode,
         currentService,
         setService,
@@ -65,13 +64,13 @@ export default function NewServicePage() {
     } = useService()
     const { user, companySelected } = useUser()
     
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    // const [isDialogOpen, setIsDialogOpen] = useState(false)
     // const [selectedItem, setSelectedItem] = useState<PurchaseItems | null>(null)
 
-    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
+    // const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
+    // const [isDeleting, setIsDeleting] = useState(false)
 
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    // const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const isVisualize = currentMode === 'visualize'
