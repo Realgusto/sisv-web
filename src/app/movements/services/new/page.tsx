@@ -1,13 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import { Combobox } from "@/components/ui/combobox"
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Service, StatusService } from "@prisma/client"
-import { ptBR } from "date-fns/locale"
-import { CalendarIcon, Edit, MoreVertical,  PackageX, Plus, Save, X } from "lucide-react"
+import { CalendarIcon, Save, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { useUser } from "@/contexts/UserContext"
@@ -15,43 +12,43 @@ import { useRouter } from "next/navigation"
 import FetchAPI from "@/utils/fetch-api"
 import { v4 as uuidv4 } from "uuid"
 import { useService } from "@/contexts/ServiceContext"
-import {
-    Table,
-    TableCaption,
-    TableHeader,
-    TableHead,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableRow,
-} from "@/components/ui/table"
-import {
-    Dialog,
-    DialogClose,
-    DialogHeader,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import NotFound from "@/components/NotFound"
-import {
-    DropdownMenu,
-    DropdownMenuItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogTitle,
-    AlertDialogHeader,
-    AlertDialogDescription,
-    AlertDialogCancel
-} from "@/components/ui/alert-dialog"
-import Loader from "@/components/ui/loader"
+// import {
+//     Table,
+//     TableCaption,
+//     TableHeader,
+//     TableHead,
+//     TableBody,
+//     TableCell,
+//     TableFooter,
+//     TableRow,
+// } from "@/components/ui/table"
+// import {
+//     Dialog,
+//     DialogClose,
+//     DialogHeader,
+//     DialogContent,
+//     DialogDescription,
+//     DialogFooter,
+//     DialogTitle,
+// } from "@/components/ui/dialog"
+// import NotFound from "@/components/NotFound"
+// import {
+//     DropdownMenu,
+//     DropdownMenuItem,
+//     DropdownMenuContent,
+//     DropdownMenuTrigger
+// } from "@/components/ui/dropdown-menu"
+// import {
+//     AlertDialog,
+//     AlertDialogAction,
+//     AlertDialogContent,
+//     AlertDialogFooter,
+//     AlertDialogTitle,
+//     AlertDialogHeader,
+//     AlertDialogDescription,
+//     AlertDialogCancel
+// } from "@/components/ui/alert-dialog"
+// import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { Textarea } from "@/components/ui/textarea"
 import { itemsCriticality, itemsDepartment, itemsEquipment, itemsServiceType, statusEquipment } from "@/constants"

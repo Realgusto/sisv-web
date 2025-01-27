@@ -5,9 +5,13 @@ import { Service, StatusService } from '@prisma/client'
 
 interface ServiceContextType {
   /**
-   * Indicates if the purchase is loading.
+   * Indicates if the service is loading.
    */
   isLoading: boolean
+  /**
+   * Set the service loading.
+   */
+  setLoading: (loading: boolean) => void
   /**
    * Indicates the current mode.
    */
@@ -17,15 +21,15 @@ interface ServiceContextType {
    */
   setMode: (mode: 'new' | 'edit' | 'visualize') => void
   /**
-   * The current purchase.
+   * The current service.
    */
   currentService: Service
   /**
-   * Set the current purchase.
+   * Set the current service.
    */
   setService: (data: Service) => void
   /**
-   * Clear the current purchase.
+   * Clear the current service.
    */
   clearService: () => void
 }
@@ -85,9 +89,14 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     setCurrentService(data)
   }
 
+  const setLoading = (loading: boolean) => {
+    setIsLoading(loading)
+  }
+
   return (
     <ServiceContext.Provider value={{
       isLoading,
+      setLoading,
       currentMode,
       setMode,
       currentService,

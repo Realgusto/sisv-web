@@ -13,13 +13,11 @@ import {
     TableCell
 } from '@/components/ui/table'
 import {
-    Fingerprint,
     Edit,
     MoreVertical,
     PackageX,
     Plus,
-    X,
-    File
+    X
 } from 'lucide-react'
 import {
     DropdownMenu,
@@ -51,7 +49,7 @@ import { formatZero } from '@/utils'
 export default function Services() {
     const { push } = useRouter()
     const { setMode, setService, currentService } = useService()
-    const { user, companySelected } = useUser()
+    const { companySelected } = useUser()  // user
     
     // const [date, setDate] = useState<Date>(new Date())
 
@@ -149,10 +147,10 @@ export default function Services() {
         }
     }
 
-    const handleSendService = async (service: Service) => {
-        setService(service)
-        push('/movements/purchases/print')
-    }
+    // const handleSendService = async (service: Service) => {
+    //     setService(service)
+    //     push('/movements/purchases/print')
+    // }
 
     useEffect(() => {
         const fetchServices = async () => {
