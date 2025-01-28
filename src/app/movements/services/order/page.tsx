@@ -9,7 +9,6 @@ import {
     TableRow,
     TableHead,
     TableBody,
-    TableFooter,
     TableCell
 } from '@/components/ui/table'
 import {
@@ -329,8 +328,8 @@ export default function Services() {
                             ))
                         }
                     </TableBody>
-                    <TableFooter>
-                        {/* <TableRow>
+                    {/* <TableFooter>
+                        <TableRow>
                             <TableCell colSpan={5} className="select-none text-base font-bold">Total</TableCell>
                             <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-base font-bold">
                                 {Intl.NumberFormat('pt-BR', {
@@ -344,8 +343,8 @@ export default function Services() {
                                 }, 0))}
                             </TableCell>
                             <TableCell className="w-[35px] sm:w-[50px] text-right select-none" />
-                        </TableRow> */}
-                    </TableFooter>
+                        </TableRow>
+                    </TableFooter> */}
                 </Table>
             }
         </div>
