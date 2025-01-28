@@ -15,9 +15,11 @@ import {
 import {
     Edit,
     MoreVertical,
+    OctagonAlert,
     PackageX,
     Plus,
     X,
+    Clock,
 } from 'lucide-react'
 import {
     DropdownMenu,
@@ -255,11 +257,17 @@ export default function Services() {
                                     <TableCell className="w-[80px] sm:w-[150px] select-none text-xs sm:text-base">{service.status ? service.status : 'N . D'}</TableCell>
                                     <TableCell className="w-[80px] sm:w-[150px] text-right select-none text-xs sm:text-base font-bold">
                                         {service.criticality && service.criticality === 'high' ? 
-                                            <FileWarning className="h-8 w-8 ml-auto text-red-500" />
+                                            <div className="h-7 w-7 ml-auto mr-5 flex items-center justify-center bg-red-500 rounded-full">
+                                                <OctagonAlert className="h-5 w-5 text-white" />
+                                            </div>
                                         : service.criticality && service.criticality === 'medium' ?
-                                            <OctagonAlert className="h-8 w-8 ml-auto text-yellow-500" />
+                                            <div className="h-7 w-7 ml-auto mr-5 flex items-center justify-center bg-yellow-500 rounded-full">
+                                                <OctagonAlert className="h-5 w-5 text-white" />
+                                            </div>
                                         : service.criticality && service.criticality === 'low' &&
-                                            <Check className="h-8 w-8 ml-auto text-green-500" />
+                                            <div className="h-7 w-7 ml-auto mr-5 flex items-center justify-center bg-green-500 rounded-full">
+                                                <Clock className="h-5 w-5 text-white" />
+                                            </div>
                                         }
                                     </TableCell>
                                     <TableCell className="w-[35px] sm:w-[50px] text-right select-none">
