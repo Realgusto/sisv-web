@@ -80,7 +80,7 @@ export default function NewPurchasePage() {
     const isVisualize = currentMode === 'visualize'
 
     const handleSaveItem = async () => {
-        if (!selectedItem || selectedItem.product === '' || selectedItem.quantity === 0 || selectedItem.unitPrice === 0) {
+        if (!selectedItem || selectedItem.product === '' || selectedItem.quantity === 0) {
             toast.error('Preencha todos os campos corretamente')
             return
         }
@@ -148,6 +148,16 @@ export default function NewPurchasePage() {
             toast.error('Preencha o campo fornecedor')
             setIsSubmitting(false)
             return
+        }
+
+        
+        if (currentPage === 'order') {
+            const hasInvalidItem = currentPurchase.items.some(item => item.quantity === 0 || item.unitPrice === 0);
+            if (hasInvalidItem) {
+                toast.error('Preencha as quantidades e os valores unitários dos itens')
+                setIsSubmitting(false)
+                return
+            }
         }
 
         const newOrderId = currentPurchase.id !== '' ? currentPurchase.id : uuidv4()

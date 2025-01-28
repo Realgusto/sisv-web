@@ -57,7 +57,7 @@ export default function PrintPurchasePage() {
                             creator="4easy - SISV"
                             subject={currentPage === 'order' ? `Ordem de Compra ${formatZero(currentPurchase.sequence, 6)}` : `Orçamento de Compra ${formatZero(currentPurchase.sequence, 6)}`}
                         >
-                            <Page size="A4" wrap orientation="portrait" style={styles.page}>
+                            <Page size="A4" wrap orientation="landscape" style={styles.page}>
                                 <View style={[styles.header, { marginBottom: 5 }]}>
                                     <Text style={styles.headerCompany}>{companySelected?.fantasy ? companySelected?.fantasy : companySelected?.name}</Text>
                                     <Text style={styles.headerCompany}>CNPJ: {companySelected?.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')}</Text>
