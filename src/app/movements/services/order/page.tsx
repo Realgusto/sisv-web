@@ -18,9 +18,6 @@ import {
     PackageX,
     Plus,
     X,
-    Check,
-    FileWarning,
-    OctagonAlert
 } from 'lucide-react'
 import {
     DropdownMenu,
@@ -48,7 +45,6 @@ import NotFound from '@/components/NotFound'
 import { useRouter } from 'next/navigation'
 import { useService } from '@/contexts/ServiceContext'
 import { formatZero } from '@/utils'
-import Hoverable from '@/components/Hoverable'
 
 export default function Services() {
     const { push } = useRouter()

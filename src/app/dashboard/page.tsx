@@ -98,7 +98,7 @@ export default function Dashboard() {
       }
     };
     fetchData()
-  }, []) //
+  }, [companySelected, push])
 
   if (!overview) {
     return (

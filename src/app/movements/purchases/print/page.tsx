@@ -1,6 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { usePurchase } from "@/contexts/PurchaseContext"
 import NotFound from "@/components/NotFound"
@@ -23,11 +22,11 @@ export default function PrintPurchasePage() {
         clearPurchase
     } = usePurchase()
 
-    useCallback(() => {
-        if (!currentPurchase || currentPurchase.items.length === 0) {
-            back()
-        }
-    }, [currentPurchase])
+    // useEffect(() => {
+    //     if (!currentPurchase || currentPurchase.items.length === 0) {
+    //         back()
+    //     }
+    // }, [currentPurchase, back])
 
     const handleBack = () => {
         back()
