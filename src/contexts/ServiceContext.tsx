@@ -70,6 +70,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
       approval_user_id: null,
       date: new Date(),
       end_date: new Date(new Date().setDate(new Date().getDate() + 1)),
+      program_date: null,
       status: StatusService.Aberta,
       department: null,
       equipment: null,
