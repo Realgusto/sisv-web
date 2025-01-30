@@ -1,6 +1,6 @@
 "use server"
 
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse, type MiddlewareConfig, type NextRequest } from "next/server"
 import { TOKEN_KEY } from "./constants"
 
 export default function middleware(request: NextRequest) {
@@ -21,6 +21,6 @@ export default function middleware(request: NextRequest) {
     }
 }
 
-export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']   //['/((?!api|_next/static|_next/image|favicon.ico).*)']
+export const config: MiddlewareConfig = {
+    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }

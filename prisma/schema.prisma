@@ -119,6 +119,7 @@ model Service {
   approval_user       User?         @relation("ApprovalServiceUser", fields: [approval_user_id], references: [id])
   date                DateTime      @default(now())
   end_date            DateTime?
+  program_date        DateTime?
   department          String?
   equipment           String?
   criticality         String?

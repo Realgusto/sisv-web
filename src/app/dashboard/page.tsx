@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { DollarSign, Users, ShoppingCart, UserMinus, Banknote, Receipt } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -27,74 +27,80 @@ export default function Dashboard() {
   const [sales, setSales] = useState<MonthlySales[]>([])
   const [topFive, setTopFive] = useState<bestSeller[]>([])
 
+  const hasFetchedData = useRef(false)
+
   const CONTAINER_HEIGHT = cn('h-[220px] sm:h-[270px] md:h-[320px] lg:h-[370px] xl:h-[420px]')
   
   useEffect(() => {
     const fetchData = async () => {
-      if (!companySelected || companySelected.id === '') {
-        push('/companies')
-        return
-      }
-      
-      const id = (new Date().getMonth() + 1).toString().padStart(2, '0') + new Date().getFullYear().toString()
-  
-      const response = await FetchAPI({
-        URL: `/api/overview?id=${id}&companyId=${companySelected?.id}`,
-        method: 'GET'
-      })
-
-      if ((response.status !== 200) && (response.status !== 404)) {
-        throw new Error('Erro ao buscar dados: ' + response.statusText)
-      } else if (response.status === 404) {
-        toast.error('Nenhuma métrica encontrada')
+      if (!hasFetchedData.current) {
+        hasFetchedData.current = true
         
-        setOverview({
-          activeCustomers: 0,
-          salesMonthly: 0,
-          salesLastYear: [],
-          top5BestSeller: [],
-          averageTicket: 0,
-          inactiveCustomers: 0,
-          expenses: 0,
-          shopping: 0,
-          receipt: 0,
-          payment: 0,
-          updated_at: null
+        if (!companySelected || companySelected.id === '') {
+          push('/companies')
+          return
+        }
+        
+        const id = (new Date().getMonth() + 1).toString().padStart(2, '0') + new Date().getFullYear().toString()
+    
+        const response = await FetchAPI({
+          URL: `/api/overview?id=${id}&companyId=${companySelected?.id}`,
+          method: 'GET'
         })
-      } else {
-        const metrics: MetricsType = await response.json()
-        setOverview(metrics)
 
-        const pastMonth = new Date().getMonth() === 0 ? 12 : new Date().getMonth()
-        const pastSales = metrics.salesLastYear.find((value) => Number(value.mth) === pastMonth)
-        const pastValue = pastSales ? pastSales.tot_sales : 0
-        const actualValue = metrics.salesMonthly || 0
+        if ((response.status !== 200) && (response.status !== 404)) {
+          throw new Error('Erro ao buscar dados: ' + response.statusText)
+        } else if (response.status === 404) {
+          toast.info('Nenhuma métrica encontrada')
+          
+          setOverview({
+            activeCustomers: 0,
+            salesMonthly: 0,
+            salesLastYear: [],
+            top5BestSeller: [],
+            averageTicket: 0,
+            inactiveCustomers: 0,
+            expenses: 0,
+            shopping: 0,
+            receipt: 0,
+            payment: 0,
+            updated_at: null
+          })
+        } else {
+          const metrics: MetricsType = await response.json()
+          setOverview(metrics)
 
-        const crescimento = pastValue === 0 ? 0 : Math.round(((actualValue - pastValue) / pastValue) * 100)
-        setCrescimentoMensal(crescimento)
+          const pastMonth = new Date().getMonth() === 0 ? 12 : new Date().getMonth()
+          const pastSales = metrics.salesLastYear.find((value) => Number(value.mth) === pastMonth)
+          const pastValue = pastSales ? pastSales.tot_sales : 0
+          const actualValue = metrics.salesMonthly || 0
 
-        const lastYear: { mth: number, tot_sales: number }[] = metrics.salesLastYear ? JSON.parse(JSON.stringify(metrics.salesLastYear)) : [];
-        setSales(lastYear.map((sales) => {
-          return {
-            mes: format(new Date(new Date().getFullYear(), sales.mth - 1), 'MMMM', { locale: ptBR }),
-            valor: sales.tot_sales,
-          } 
-        }))
+          const crescimento = pastValue === 0 ? 0 : Math.round(((actualValue - pastValue) / pastValue) * 100)
+          setCrescimentoMensal(crescimento)
 
-        const top5: { product: string, un: string, amount: number }[] = metrics.top5BestSeller ? JSON.parse(JSON.stringify(metrics.top5BestSeller)) : [];
+          const lastYear: { mth: number, tot_sales: number }[] = metrics.salesLastYear ? JSON.parse(JSON.stringify(metrics.salesLastYear)) : [];
+          setSales(lastYear.map((sales) => {
+            return {
+              mes: format(new Date(new Date().getFullYear(), sales.mth - 1), 'MMMM', { locale: ptBR }),
+              valor: sales.tot_sales,
+            } 
+          }))
 
-        setTopFive(top5.map((product, index) => {
-          return {
-            nome: product.product,
-            unidade: product.un,
-            quantidade: product.amount,
-            fill: 'hsl(var(--chart-'+(index+1)+'))'
-          }
-        }))
+          const top5: { product: string, un: string, amount: number }[] = metrics.top5BestSeller ? JSON.parse(JSON.stringify(metrics.top5BestSeller)) : [];
 
-        toast.success(moment(new Date(metrics.updated_at)).calendar(), {
-          duration: 10000,
-        })
+          setTopFive(top5.map((product, index) => {
+            return {
+              nome: product.product,
+              unidade: product.un,
+              quantidade: product.amount,
+              fill: 'hsl(var(--chart-'+(index+1)+'))'
+            }
+          }))
+
+          toast.success(moment(new Date(metrics.updated_at)).calendar(), {
+            duration: 5000,
+          })
+        }
       }
     };
     fetchData()

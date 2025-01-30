@@ -47,3 +47,7 @@ export const formatZero = (value: number, length: number) => {
   }
   return value.toString().padStart(length, '0')
 }
+
+export const formatStatus = (statusStr: string) => {
+  return statusStr.replace(/_/g, ' ').toUpperCase()
+}

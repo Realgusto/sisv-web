@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Combobox } from "@/components/ui/combobox"
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
 import { Service, StatusService } from "@prisma/client"
 import { CalendarIcon, Save, X } from "lucide-react"
 import { useState } from "react"
@@ -51,7 +53,13 @@ import { useService } from "@/contexts/ServiceContext"
 // import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
 import { Textarea } from "@/components/ui/textarea"
-import { itemsCriticality, itemsDepartment, itemsEquipment, itemsServiceType, statusEquipment } from "@/constants"
+import {
+    itemsCriticality,
+    itemsDepartment,
+    itemsEquipment,
+    itemsServiceType,
+    statusEquipment
+} from "@/constants"
 
 export default function NewServicePage() {
     const { back } = useRouter()
@@ -72,6 +80,7 @@ export default function NewServicePage() {
 
     // const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [selectedValue, setSelectedValue] = useState<string | undefined>()
 
     const isVisualize = currentMode === 'visualize'
 
@@ -132,7 +141,17 @@ export default function NewServicePage() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        if (!currentService) return
+        if (!currentService) {
+            toast.error('Erro ao carregar a ordem de serviço')
+            setIsSubmitting(false)
+            return
+        }
+
+        if (!user) {
+            toast.error('Você não está logado. Faça login, e tente novamente!')
+            setIsSubmitting(false)
+            return
+        }
 
         if (currentService.department === null || currentService.department === '' || currentService.equipment === null || currentService.equipment === '' || currentService.criticality === null || currentService.criticality === '') {
             toast.error('Preencha todos os campos corretamente')
@@ -143,28 +162,35 @@ export default function NewServicePage() {
         const newServiceId = currentService.id !== '' ? currentService.id : uuidv4()
         const newSequence = currentService.id !== '' ? currentService.sequence : 0
 
+        const newStatus = currentService.status === StatusService.Em_andamento && selectedValue === 'concluido' ?
+                            StatusService.Concluida :
+                          currentService.status === StatusService.Em_andamento && selectedValue === 'parcial' ?
+                            StatusService.Concluida_parcialmente :
+                          currentService.id !== '' ? currentService.status : StatusService.Aberta
+
         const newService: Service = {
             id: newServiceId,
             sequence: newSequence,
             companyId: companySelected ? companySelected.id : '',
-            user_id: user ? user.id : '',
-            service_user_id: null,
+            user_id: currentService.id !== '' ? currentService.user_id : user.id,
+            service_user_id: currentService.id !== '' && currentService.status === StatusService.Em_andamento ? user.id : null,
             approval_user_id: null,
             date: currentService.date ? currentService.date : new Date(),
             end_date: currentService.end_date,
+            program_date: currentService.program_date,
             department: currentService.department,
             equipment: currentService.equipment,
-            status: currentService.id !== '' ? currentService.status : StatusService.Aberta,
+            status: newStatus,
             criticality: currentService.criticality,
-            equipment_status: null,
-            service_type: null,
-            service_description: null,
+            equipment_status: currentService.equipment_status,
+            service_type: currentService.service_type,
+            service_description: currentService.service_description,
             observations: currentService.observations,
             updated_at: new Date(),
         }
 
         try {
-            const method = currentService.id ? 'PUT' : 'POST'
+            const method = currentService.id !== '' ? 'PUT' : 'POST'
             
             const response = await FetchAPI({
                 URL: '/api/services',
@@ -172,7 +198,7 @@ export default function NewServicePage() {
                 body: JSON.stringify(newService)
             })
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 throw new Error(`Erro ao salvar a ordem de serviço: ${response.statusText}`)
             } else {
                 toast.success(`Ordem de serviço salva com sucesso`)
@@ -236,7 +262,6 @@ export default function NewServicePage() {
                                 <span className="hidden sm:block ml-2">{isSubmitting ? 'Salvando...' : 'Salvar'}</span>
                             </Button>
                         </div>
-                        
                     }
                 </div>
             
@@ -250,6 +275,7 @@ export default function NewServicePage() {
                             disabled
                         />
                     </div>
+
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Data</label>
                         {/* <Popover open={false} onOpenChange={() => {}}>
@@ -280,6 +306,7 @@ export default function NewServicePage() {
                             </PopoverContent>
                         </Popover> */}
                     </div>
+
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Data de Finalização</label>
                         {/* <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -294,7 +321,8 @@ export default function NewServicePage() {
                                     disabled
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {currentService.status === StatusService.Concluida && currentService.end_date ? new Date(currentService.end_date).toLocaleDateString('pt-BR') : <span>O.S não finalizada</span>}
+                                    {(currentService.status === StatusService.Concluida || currentService.status === StatusService.Concluida_parcialmente) && currentService.end_date ?
+                                        new Date(currentService.end_date).toLocaleDateString('pt-BR') : <span>O.S não finalizada</span>}
                                 </Button>
                             {/* </PopoverTrigger>
                             <PopoverContent className="p-0 w-full">
@@ -310,7 +338,8 @@ export default function NewServicePage() {
                                 />
                             </PopoverContent>
                         </Popover> */}
-                    </div>                            
+                    </div>      
+
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Setor</label>
                         <Combobox
@@ -330,6 +359,7 @@ export default function NewServicePage() {
                             }} 
                         />
                     </div>
+
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Equipamento</label>
                         <Combobox
@@ -350,6 +380,7 @@ export default function NewServicePage() {
                         />
                     </div>
                 </div>
+
                 <div className="flex flex-col lg:flex-row gap-6 items-start">
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Criticidade</label>
@@ -370,6 +401,7 @@ export default function NewServicePage() {
                             }} 
                         />
                     </div>
+
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Status do Equipamento</label>
                         <Combobox
@@ -389,6 +421,7 @@ export default function NewServicePage() {
                             }} 
                         />
                     </div>
+
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Tipo de Serviço</label>
                         <Combobox
@@ -408,25 +441,45 @@ export default function NewServicePage() {
                             }} 
                         />
                     </div>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Descrição do Serviço</label>
-                        <Textarea
-                            value={currentService.service_description || ''}
-                            onChange={(e) => setService({ ...currentService, service_description: e.target.value })} 
-                            className={cn("mt-[2px] block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-foreground focus:border-foreground", isVisualize && 'cursor-not-allowed')}
-                            disabled={isVisualize}
-                        />
-                    </div>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
-                        <Textarea
-                            value={currentService.observations || ''}
-                            onChange={(e) => setService({ ...currentService, observations: e.target.value })} 
-                            className={cn("mt-[2px] block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-foreground focus:border-foreground", isVisualize && 'cursor-not-allowed')}
-                            disabled={isVisualize}
-                        />
-                    </div>
                 </div>
+
+                {   currentService.status === StatusService.Em_andamento &&
+                    <div className="flex flex-col lg:flex-row gap-6 items-start">
+                        <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Descrição do Serviço</label>
+                            <Textarea
+                                value={currentService.service_description || ''}
+                                onChange={(e) => setService({ ...currentService, service_description: e.target.value })} 
+                                className={cn("mt-[2px] block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-foreground focus:border-foreground", isVisualize && 'cursor-not-allowed')}
+                                disabled={isVisualize}
+                            />
+                        </div>
+
+                        <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Observações</label>
+                            <Textarea
+                                value={currentService.observations || ''}
+                                onChange={(e) => setService({ ...currentService, observations: e.target.value })} 
+                                className={cn("mt-[2px] block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-foreground focus:border-foreground", isVisualize && 'cursor-not-allowed')}
+                                disabled={isVisualize}
+                            />
+                        </div>
+
+                        <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Status do Serviço</label>                        
+                            <RadioGroup value={selectedValue} onValueChange={setSelectedValue} defaultValue="concluido" className="mt-2">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="concluido" id="r1" />
+                                    <Label htmlFor="r1">Concluído</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="parcial" id="r2" />
+                                    <Label htmlFor="r2">Concluído Parcialmente</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </div>
+                }
             </form>
         </div>
     );
