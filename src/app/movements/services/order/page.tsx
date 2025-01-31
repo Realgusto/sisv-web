@@ -206,7 +206,7 @@ export default function Services() {
 
     const handleFinalize = async (service: Service) => {
         setService(service)
-        // push('/movements/services/print')
+        push('/movements/services/print')
     }
 
     useEffect(() => {
@@ -348,7 +348,7 @@ export default function Services() {
                                                             <DropdownMenuItem onClick={() => handleOpenAlertProgram(service)}>
                                                                 <Clock className="h-3 w-3 mr-2" /> Programar
                                                             </DropdownMenuItem>
-                                                        : service.status === StatusService.Em_andamento &&
+                                                        : (service.status === StatusService.Concluida || service.status === StatusService.Concluida_parcialmente) &&
                                                             <DropdownMenuItem className="text-green-600" onClick={() => handleFinalize(service)}>
                                                                 <Check className="h-3 w-3 mr-2" /> Finalizar
                                                             </DropdownMenuItem>

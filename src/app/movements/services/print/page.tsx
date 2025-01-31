@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { usePurchase } from "@/contexts/PurchaseContext"
+import { useService } from "@/contexts/ServiceContext"
 import NotFound from "@/components/NotFound"
 import Loader from "@/components/ui/loader"
 import { formatZero } from "@/utils"
@@ -18,20 +18,19 @@ export default function PrintPurchasePage() {
 
     const {
         isLoading,
-        currentPage,
-        currentPurchase,
-        clearPurchase
-    } = usePurchase()
+        currentService,
+        clearService
+    } = useService()
 
     useEffect(() => {
-        if (!currentPurchase || currentPurchase.items.length === 0) {
+        if (!currentService) {
             back()
         }
-    }, [currentPurchase, back])
+    }, [currentService, back])
 
     const handleBack = () => {
         back()
-        clearPurchase()
+        clearService()
     }
 
     return (
@@ -45,17 +44,17 @@ export default function PrintPurchasePage() {
             {   isLoading ?
                     <Loader />
                 :
-                !currentPurchase || currentPurchase.items.length === 0 ?
+                !currentService ?
                     <NotFound
                         title='Nenhum documento encontrado.'
                     />
                 :
                     <PDFViewer className="mt-1 w-full h-screen">
                         <Document
-                            title={companySelected?.cnpj + '.O.C.' + formatZero(currentPurchase.sequence, 6)}
+                            title={companySelected?.cnpj + '.O.S.' + formatZero(currentService.sequence, 6)}
                             author={companySelected?.fantasy ? companySelected?.fantasy : companySelected?.name}
                             creator="4easy - SISV"
-                            subject={currentPage === 'order' ? `Ordem de Compra ${formatZero(currentPurchase.sequence, 6)}` : `Orçamento de Compra ${formatZero(currentPurchase.sequence, 6)}`}
+                            subject={`Ordem de Servico ${formatZero(currentService.sequence, 6)}`}
                         >
                             <Page size="A4" wrap orientation="portrait" style={styles.page}>
                                 <View style={[styles.header, { marginBottom: 5 }]}>
@@ -68,27 +67,29 @@ export default function PrintPurchasePage() {
                                 </View>
                                 <View style={[styles.header, { marginTop: 20 }]}>
                                     <View>
-                                        <Text style={styles.headerTitle}>N° {currentPage === 'order' ? 'da Ordem' : 'do Orçamento'}</Text>
-                                        <Text style={styles.headerText}>{formatZero(currentPurchase.sequence, 6)}</Text>
+                                        <Text style={styles.headerTitle}>N° da Ordem</Text>
+                                        <Text style={styles.headerText}>{formatZero(currentService.sequence, 6)}</Text>
                                     </View>
                                     <View>
                                         <Text style={styles.headerTitle}>Data</Text>
-                                        <Text style={styles.headerText}>{currentPurchase.date ? new Date(currentPurchase.date).toLocaleDateString('pt-BR') : <span>Nenhuma data selecionada</span>}</Text>
+                                        <Text style={styles.headerText}>{currentService.date ? new Date(currentService.date).toLocaleDateString('pt-BR') : <span>Nenhuma data selecionada</span>}</Text>
                                     </View>
                                     <View>
-                                        <Text style={styles.headerTitle}>Previsão</Text>
-                                        <Text style={styles.headerText}>{currentPurchase.delivery_date ? new Date(currentPurchase.delivery_date).toLocaleDateString('pt-BR') : <span>Nenhuma previsão selecionada</span>}</Text>
-                                    </View>                            
-                                    <View>
-                                        <Text style={styles.headerTitle}>Setor</Text>
-                                        <Text style={styles.headerText}>{currentPurchase.department || 'Nenhum setor selecionado'}</Text>
-                                    </View>
-                                    <View>
-                                        <Text style={styles.headerTitle}>Fornecedor</Text>
-                                        <Text style={styles.headerText}>{currentPurchase.supplier || 'Nenhum fornecedor selecionado'}</Text>
+                                        <Text style={styles.headerTitle}>Finalizada em</Text>
+                                        <Text style={styles.headerText}>{currentService.end_date ? new Date(currentService.end_date).toLocaleDateString('pt-BR') : <span>Nenhuma previsão selecionada</span>}</Text>
                                     </View>
                                 </View>
-                                <View style={styles.contentHeader}>
+                                <View style={[styles.header, { marginTop: 20 }]}>
+                                    <View>
+                                        <Text style={styles.headerTitle}>Setor</Text>
+                                        <Text style={styles.headerText}>{currentService.department || 'Nenhum setor selecionado'}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.headerTitle}>Equipamento</Text>
+                                        <Text style={styles.headerText}>{currentService.equipment || 'Nenhum equipamento selecionado'}</Text>
+                                    </View>
+                                </View>
+                                {/* <View style={styles.contentHeader}>
                                     <Text style={[styles.contentHeaderTitle, { width: '60%' }]}>Itens</Text>
                                     <Text style={[styles.contentHeaderTitle, { width: '13%', textAlign: 'center' }]}>Quant.</Text>
                                     <Text style={[styles.contentHeaderTitle, { width: '13%', textAlign: 'center' }]}>V. Unit.</Text>
@@ -118,8 +119,8 @@ export default function PrintPurchasePage() {
                                             )
                                         })
                                     }
-                                </View>
-                                <View style={styles.border} />
+                                </View> */}
+                                {/* <View style={styles.border} />
                                 <View style={styles.contentFooter}>
                                     <Text style={styles.contentFooterText}>Total</Text>
                                     <Text style={styles.contentFooterText}>
@@ -130,7 +131,7 @@ export default function PrintPurchasePage() {
                                             return total + (purchaseItem.total || 0)
                                         }, 0))}
                                     </Text>
-                                </View>
+                                </View> */}
                                 <View style={styles.counter}>
                                     <Text render={({ pageNumber, totalPages }) => (
                                         `Pág. ${pageNumber} / ${totalPages}`

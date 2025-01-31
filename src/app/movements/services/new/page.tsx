@@ -467,7 +467,13 @@ export default function NewServicePage() {
 
                         <div className="w-full">
                             <label className="block text-sm font-medium text-gray-700 dark:text-zinc-400">Status do Serviço</label>                        
-                            <RadioGroup value={selectedValue} onValueChange={setSelectedValue} defaultValue="concluido" className="mt-2">
+                            <RadioGroup
+                                value={selectedValue}
+                                onValueChange={setSelectedValue}
+                                // defaultValue="concluido"
+                                className="mt-2"
+                                disabled={isVisualize}
+                            >
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="concluido" id="r1" />
                                     <Label htmlFor="r1">Concluído</Label>
