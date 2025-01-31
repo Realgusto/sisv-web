@@ -204,11 +204,6 @@ export default function Services() {
         }
     }
 
-    const handleFinalize = async (service: Service) => {
-        setService(service)
-        push('/movements/services/print')
-    }
-
     useEffect(() => {
         const fetchServices = async () => {
             setIsLoading(true)
@@ -344,13 +339,9 @@ export default function Services() {
                                                             }}>
                                                                 <Cog className="h-3 w-3 mr-2" /> Tratar
                                                             </DropdownMenuItem>
-                                                        : service.status === StatusService.Programada ?
+                                                        : service.status === StatusService.Programada &&
                                                             <DropdownMenuItem onClick={() => handleOpenAlertProgram(service)}>
                                                                 <Clock className="h-3 w-3 mr-2" /> Programar
-                                                            </DropdownMenuItem>
-                                                        : (service.status === StatusService.Concluida || service.status === StatusService.Concluida_parcialmente) &&
-                                                            <DropdownMenuItem className="text-green-600" onClick={() => handleFinalize(service)}>
-                                                                <Check className="h-3 w-3 mr-2" /> Finalizar
                                                             </DropdownMenuItem>
                                                     }
                                                     <DropdownMenuItem onClick={() => handleOpenDialog(service)}>
