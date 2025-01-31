@@ -82,7 +82,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const selectCompany = (company: Company) => {
     setCompanySelected(company)
-    const ret = Cookies.set(COMPANY_KEY, company.id, { expires: 1 })
+    const ret = Cookies.set(COMPANY_KEY, company.id)
     if (ret && ret !== '') {
       if (user?.admin) {
         push(URL_ADMIN)

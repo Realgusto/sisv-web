@@ -19,7 +19,8 @@ import {
     PackageX,
     Plus,
     X,
-    File
+    File,
+    DollarSign
 } from 'lucide-react'
 import {
     DropdownMenu,
@@ -47,6 +48,8 @@ import NotFound from '@/components/NotFound'
 import { useRouter } from 'next/navigation'
 import { usePurchase } from '@/contexts/PurchaseContext'
 import { formatZero } from '@/utils'
+import { loadStripe } from '@stripe/stripe-js'
+import Loader from '@/components/ui/loader'
 
 export default function Order() {
     const { push } = useRouter()
@@ -59,6 +62,37 @@ export default function Order() {
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [isDeleting, setIsDeleting] = useState(false)
+
+    const [isCreatingCheckout, setIsCreatingCheckout] = useState(false)
+
+    const handlePayment = async () => {
+        try {
+            setIsCreatingCheckout(true)
+            const checkoutResponse = await FetchAPI({
+                URL: '/api/create-checkout-session',
+                method: 'POST',
+                body: JSON.stringify({ testId: '123' })
+            })
+
+            if (checkoutResponse.status !== 200) {
+                throw new Error('Failed to create checkout session')
+            }
+            
+            const stripeClient = await loadStripe(
+                process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
+            )
+
+            if (!stripeClient) throw new Error('Stripe failed to initialize')
+
+            const { sessionId } = await checkoutResponse.json()
+            await stripeClient.redirectToCheckout({ sessionId })
+
+        } catch(err) {
+            console.error(err)
+        } finally {
+            setIsCreatingCheckout(false)
+        }
+    }
 
     const handleAutorize = (order: Purchase) => {
         if (!user || !user.admin) {
@@ -208,7 +242,9 @@ export default function Order() {
                 </Button>
             </div>
             {   orders.length === 0 && !isLoading ? 
-                <NotFound title='Nenhuma ordem encontrada. Para iniciar, clique no botão "Ordem" acima, e crie uma nova ordem.' />
+                    <NotFound title='Nenhuma ordem encontrada. Para iniciar, clique no botão "Ordem" acima, e crie uma nova ordem.' />
+            :   isCreatingCheckout ?
+                    <Loader />
             :
                 <Table className="min-w-full bg-background shadow-md rounded-lg overflow-hidden">
                     <TableCaption className="select-none">Uma lista das suas ordens de compra.</TableCaption>
@@ -281,9 +317,14 @@ export default function Order() {
                                                         <Fingerprint className="h-3 w-3 mr-2" /> Autorizar
                                                     </DropdownMenuItem>
                                                     : order.status === StatusPurchase.Autorizada &&
-                                                    <DropdownMenuItem className="text-green-600" onClick={() => handleSendOrder(order)}>
-                                                        <File className="h-3 w-3 mr-2" /> Gerar
-                                                    </DropdownMenuItem>
+                                                    <> 
+                                                        <DropdownMenuItem disabled={isCreatingCheckout} className="text-green-600" onClick={() => handlePayment()}>
+                                                            <DollarSign className="h-3 w-3 mr-2" /> Pagar
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-green-600" onClick={() => handleSendOrder(order)}>
+                                                            <File className="h-3 w-3 mr-2" /> Gerar
+                                                        </DropdownMenuItem>
+                                                    </>
                                                 }
                                                 <DropdownMenuItem onClick={() => handleOpenDialog(order)}>
                                                     <Edit className="h-3 w-3 mr-2" /> Editar
