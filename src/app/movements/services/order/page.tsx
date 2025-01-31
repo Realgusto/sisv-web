@@ -19,7 +19,6 @@ import {
     Plus,
     X,
     Clock,
-    Check,
     Cog,
     CalendarIcon
 } from 'lucide-react'
