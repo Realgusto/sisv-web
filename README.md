@@ -38,7 +38,7 @@ git clone https://github.com/realgusto/sisv.git
 
 2. Install dependencies
 ```bash
-cd sisv_erp
+cd sisv
 npm install
 ```
 3. Set up environment variables
