@@ -33,7 +33,7 @@ A modern Enterprise Resource Planning (ERP) system built with Next.js, featuring
 
 1. Clone the repository
 ```bash
-git clone https://github.com/realgusto/sisv_erp.git
+git clone https://github.com/realgusto/sisv.git
 ```
 
 2. Install dependencies
@@ -83,21 +83,10 @@ The system uses a token-based authentication system with protected routes. Non-a
 - /api/purchases
 - /api/services
 
-## 👥 Contributing
-1. Fork the project
-2. Create your feature branch (git checkout -b feature/AmazingFeature)
-3. Commit your changes (git commit -m 'Add some AmazingFeature')
-4. Push to the branch (git push origin feature/AmazingFeature)
-5. Open a Pull Request
-
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🤝 Support
-For support, email support@4easy.com.br or join our Slack channel.
+For support, email 4easy.ti@gmail.com
 
 ## ✨ Acknowledgments
 - 4easy Tecnologia team
-- All contributors who helped with the project
 
 Made with ❤️ by 4easy Tecnologia
